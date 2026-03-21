@@ -54,6 +54,12 @@ If `OPENAI_API_KEY` is not configured, the app still creates usable fallback dra
    cp .env.example .env
    ```
 
+   On Windows Command Prompt you can create it with:
+
+   ```bat
+   copy .env.example .env
+   ```
+
 2. Install dependencies:
 
    ```bash
@@ -107,4 +113,4 @@ AI drafts are **never auto-published**. The admin must upload a feature image ma
 
 ## MongoDB note
 
-Set `DATABASE_URL` to a valid MongoDB connection string, such as a local MongoDB instance or MongoDB Atlas URI, before running `prisma db push` and `npm run seed`.
+Set `DATABASE_URL` to a valid MongoDB connection string, such as a local MongoDB instance or MongoDB Atlas URI, before running `prisma db push` and `npm run seed`. The seed script now attempts to load `.env`/`.env.local` automatically, but it still needs one of those files to exist with a real MongoDB URI.

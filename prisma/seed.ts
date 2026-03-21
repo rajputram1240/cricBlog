@@ -1,7 +1,35 @@
+import fs from 'fs';
+import path from 'path';
 import { PrismaClient, BlogStatus } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
+loadEnvFile('.env');
+loadEnvFile('.env.local');
+
+if (!process.env.DATABASE_URL) {
+  throw new Error(
+    'DATABASE_URL is missing. Create a .env file in the project root (for example by copying .env.example to .env) and set it to your MongoDB URI before running `npm run seed`.',
+  );
+}
+
 const prisma = new PrismaClient();
+
+function loadEnvFile(fileName: string) {
+  const filePath = path.join(process.cwd(), fileName);
+  if (!fs.existsSync(filePath)) return;
+
+  const content = fs.readFileSync(filePath, 'utf8');
+  for (const rawLine of content.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('#')) continue;
+    const separatorIndex = line.indexOf('=');
+    if (separatorIndex === -1) continue;
+
+    const key = line.slice(0, separatorIndex).trim();
+    const value = line.slice(separatorIndex + 1).trim().replace(/^['"]|['"]$/g, '');
+    if (!process.env[key]) process.env[key] = value;
+  }
+}
 
 async function main() {
   const password = await bcrypt.hash(process.env.ADMIN_PASSWORD || 'ChangeMe123!', 10);
@@ -73,4 +101,10 @@ async function main() {
   }
 }
 
-main().finally(() => prisma.$disconnect());
+main()
+  .then(() => console.log('Seed completed successfully.'))
+  .catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  })
+  .finally(() => prisma.$disconnect());
