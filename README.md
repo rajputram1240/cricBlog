@@ -74,6 +74,8 @@ If `OPENAI_API_KEY` is not configured, the app still creates usable fallback dra
    npm run dev
    ```
 
+`npm run dev` now runs `prisma generate` first, and `npm install` also triggers `prisma generate` through `postinstall`, which prevents the common `@prisma/client did not initialize yet` error when the generated Prisma client is missing.
+
 ## Default admin credentials
 
 - Email: value from `ADMIN_EMAIL`
