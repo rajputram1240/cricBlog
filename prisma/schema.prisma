@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum BlogStatus {
+  draft
+  pending_review
+  approved
+  published
+  rejected
+}
+
+model Admin {
+  id            String     @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  email         String     @unique
+  password      String
+  approvedBlogs BlogPost[] @relation("ApprovedBlogs")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Category {
+  id        String     @id @default(auto()) @map("_id") @db.ObjectId
+  name      String     @unique
+  slug      String     @unique
+  posts     BlogPost[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model BlogPost {
+  id              String     @id @default(auto()) @map("_id") @db.ObjectId
+  title           String
+  slug            String     @unique
+  categoryId      String     @db.ObjectId
+  category        Category   @relation(fields: [categoryId], references: [id])
+  summary         String
+  outline         String
+  content         String
+  featureImage    String?
+  tags            String
+  metaTitle       String
+  metaDescription String
+  status          BlogStatus @default(draft)
+  generatedByAI   Boolean    @default(false)
+  approvedById    String?    @db.ObjectId
+  approvedBy      Admin?     @relation("ApprovedBlogs", fields: [approvedById], references: [id])
+  authorName      String     @default("Sports AI Desk")
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  publishedAt     DateTime?
+}
