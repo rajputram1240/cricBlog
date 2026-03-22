@@ -27,6 +27,36 @@ export const fanLoginSchema = z.object({
   phone: z.string().trim().regex(/^[0-9+()\-\s]{7,20}$/, 'Enter a valid phone number'),
 });
 
+export const predictionMasterLoginSchema = z.object({
+  name: z.string().min(2).max(60),
+  email: z.string().email(),
+  phone: z.string().trim().regex(/^[0-9+()\-\s]{7,20}$/, 'Enter a valid phone number'),
+  upiId: z.string().trim().min(3).max(80).regex(/^[a-zA-Z0-9._-]+@[a-zA-Z]{2,}$/i, 'Enter a valid UPI ID'),
+});
+
+export const predictionPostSchema = z.object({
+  matchTitle: z.string().trim().min(5).max(120),
+  title: z.string().trim().min(5).max(140),
+  content: z.string().trim().min(80).max(4000),
+  slipId: z.string().trim().min(3).max(80),
+  fee: z.coerce.number().positive(),
+  platform: z.string().trim().min(2).max(80),
+  chanceToWin: z.coerce.number().int().min(1).max(100),
+});
+
+export const predictionPurchaseSchema = z.object({
+  postId: z.string().min(1),
+  utr: z.string().trim().min(6).max(40),
+  buyerPhone: z.string().trim().regex(/^[0-9+()\-\s]{7,20}$/, 'Enter a valid phone number'),
+  buyerEmail: z.string().email(),
+  initiatedAt: z.string().datetime(),
+});
+
+export const predictionApprovalSchema = z.object({
+  purchaseId: z.string().min(1),
+  status: z.enum(['approved', 'rejected']),
+  masterNote: z.string().trim().max(240).optional().or(z.literal('')),
+});
 
 export const chatLoginSchema = z.object({
   name: z.string().min(2).max(60),
