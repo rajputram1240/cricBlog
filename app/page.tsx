@@ -62,6 +62,13 @@ const infoSections = [
     title: 'Work with our team on campaigns, co-branded coverage, and content distribution.',
     body: 'If you want to promote a sports product, sponsor a special series, or contribute to our fan community, our editorial and admin team can manage assets, upload content, and review each partnership submission before launch.',
   },
+  {
+    id: 'tickets',
+    href: '/tickets',
+    kicker: 'Ticket auction',
+    title: 'Fans can list upcoming cricket tickets, collect bids, and sell to the best offer.',
+    body: 'The new fan exchange lets supporters log in, post one ticket per day, accept auction-style comments from buyers, delete weak listings, and reward standout bidders after the sale.',
+  },
 ];
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; date?: string }> }) {
@@ -85,6 +92,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
             <div className="hero-actions">
               <Link href="/category/football" className="button button-primary">Football news</Link>
               <Link href="/category/cricket" className="button button-secondary">Cricket news</Link>
+              <Link href="/tickets" className="button button-secondary">Ticket auction</Link>
               <Link href="/#featured-stories" className="button button-secondary">Top stories</Link>
             </div>
             <div className="utility-list">

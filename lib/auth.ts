@@ -4,11 +4,23 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 
-const COOKIE_NAME = 'sports_admin_session';
+const ADMIN_COOKIE_NAME = 'sports_admin_session';
+const FAN_COOKIE_NAME = 'sports_fan_session';
 
 function sign(value: string) {
   const secret = process.env.SESSION_SECRET || 'change-this-secret';
   return crypto.createHmac('sha256', secret).update(value).digest('hex');
+}
+
+function makeToken(id: string) {
+  return `${id}.${sign(id)}`;
+}
+
+function readSignedId(token?: string) {
+  if (!token) return null;
+  const [id, signature] = token.split('.');
+  if (!id || sign(id) !== signature) return null;
+  return id;
 }
 
 export async function validateAdminLogin(email: string, password: string) {
@@ -19,22 +31,19 @@ export async function validateAdminLogin(email: string, password: string) {
 }
 
 export async function createSession(adminId: string) {
-  const token = `${adminId}.${sign(adminId)}`;
   const store = await cookies();
-  store.set(COOKIE_NAME, token, { httpOnly: true, sameSite: 'lax', secure: false, path: '/' });
+  store.set(ADMIN_COOKIE_NAME, makeToken(adminId), { httpOnly: true, sameSite: 'lax', secure: false, path: '/' });
 }
 
 export async function destroySession() {
   const store = await cookies();
-  store.delete(COOKIE_NAME);
+  store.delete(ADMIN_COOKIE_NAME);
 }
 
 export async function getAdminSession() {
   const store = await cookies();
-  const token = store.get(COOKIE_NAME)?.value;
-  if (!token) return null;
-  const [adminId, signature] = token.split('.');
-  if (!adminId || sign(adminId) !== signature) return null;
+  const adminId = readSignedId(store.get(ADMIN_COOKIE_NAME)?.value);
+  if (!adminId) return null;
   return prisma.admin.findUnique({ where: { id: adminId } });
 }
 
@@ -42,4 +51,28 @@ export async function requireAdmin() {
   const admin = await getAdminSession();
   if (!admin) redirect('/admin/login');
   return admin;
+}
+
+export async function loginFan(name: string, email: string) {
+  const fan = await prisma.fanUser.upsert({
+    where: { email: email.toLowerCase() },
+    update: { name },
+    create: { name, email: email.toLowerCase() },
+  });
+
+  const store = await cookies();
+  store.set(FAN_COOKIE_NAME, makeToken(fan.id), { httpOnly: true, sameSite: 'lax', secure: false, path: '/' });
+  return fan;
+}
+
+export async function logoutFan() {
+  const store = await cookies();
+  store.delete(FAN_COOKIE_NAME);
+}
+
+export async function getFanSession() {
+  const store = await cookies();
+  const fanId = readSignedId(store.get(FAN_COOKIE_NAME)?.value);
+  if (!fanId) return null;
+  return prisma.fanUser.findUnique({ where: { id: fanId } });
 }
