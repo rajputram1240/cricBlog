@@ -152,41 +152,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
       </section>
 
       <section className="shell page-section">
-        <div className="highlights-grid">
-          {highlights.map((item) => (
-            <article key={item.title} className="panel feature-card sports-panel">
-              <span className="kicker">Why fans stay</span>
-              <h3>{item.title}</h3>
-              <p className="muted-text">{item.text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="shell page-section fan-zone-grid">
-        {fanZones.map((zone) => (
-          <article key={zone.title} className="panel fan-zone-card">
-            <span className="kicker">Coverage zone</span>
-            <h2>{zone.title}</h2>
-            <p className="muted-text">{zone.body}</p>
-            <Link href={zone.href} className="text-link">{zone.label} →</Link>
-          </article>
-        ))}
-      </section>
-
-      <section className="shell page-section">
         <SearchFilters defaultCategory={params.category} defaultQuery={params.q} defaultDate={params.date} />
-      </section>
-
-      <section className="shell page-section info-grid">
-        {infoSections.map((section) => (
-          <article key={section.id} className="panel info-card sports-panel">
-            <span className="kicker">{section.kicker}</span>
-            <h2>{section.title}</h2>
-            <p className="muted-text">{section.body}</p>
-            <Link href={section.href} className="text-link">Open page →</Link>
-          </article>
-        ))}
       </section>
 
       <section className="shell page-section">
