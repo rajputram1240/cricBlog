@@ -93,6 +93,45 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
         </div>
       </section>
 
+      <section className="shell page-section home-overview-grid">
+        <div className="card sports-panel overview-panel">
+          <div className="card-body">
+            <div className="section-heading compact-section-heading">
+              <div>
+                <span className="kicker">Why this homepage feels better</span>
+                <h2>Sharper sections, stronger contrast, and a more premium first impression.</h2>
+              </div>
+            </div>
+            <div className="highlights-grid">
+              {highlights.map((item, index) => (
+                <article key={item.title} className="feature-card home-feature-card">
+                  <span className="feature-index">0{index + 1}</span>
+                  <h3>{item.title}</h3>
+                  <p className="muted-text">{item.text}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="card sports-panel quick-links-panel">
+          <div className="card-body">
+            <span className="kicker">Quick fan routes</span>
+            <h2 className="feature-title">Jump from the homepage to the experience you want.</h2>
+            <div className="fan-zone-grid home-fan-zone-grid">
+              {fanZones.map((zone) => (
+                <Link key={zone.title} href={zone.href} className={`fan-zone-card ${zone.accent}`}>
+                  <span className="kicker">{zone.label}</span>
+                  <h3>{zone.title}</h3>
+                  <p className="muted-text">{zone.body}</p>
+                  <span className="text-link">Open section →</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="shell page-section">
         <SearchFilters defaultCategory={params.category} defaultQuery={params.q} defaultDate={params.date} />
       </section>
@@ -129,6 +168,28 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
         </div>
         <div id="featured-stories" className="grid-3">
           {featuredPosts.map((post) => <BlogCard key={post.id} post={post} />)}
+        </div>
+      </section>
+
+      <section className="shell page-section info-band-section">
+        <div className="section-heading">
+          <div>
+            <span className="kicker">Beyond the headlines</span>
+            <h2>Extra ways fans can engage with the platform.</h2>
+          </div>
+          <p className="muted-text section-copy">These sections add community, utility, and trust signals so the homepage feels full and purposeful.</p>
+        </div>
+        <div className="info-grid home-info-grid">
+          {infoSections.map((section) => (
+            <Link key={section.id} href={section.href} className="card info-card home-info-card">
+              <div className="card-body">
+                <span className="kicker">{section.kicker}</span>
+                <h3>{section.title}</h3>
+                <p className="muted-text">{section.body}</p>
+                <span className="text-link">Learn more →</span>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
