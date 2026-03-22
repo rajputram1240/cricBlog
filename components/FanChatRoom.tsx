@@ -124,7 +124,7 @@ export function FanChatRoom({ initialMessages, user, openReports }: { initialMes
       <section className="chat-app-frame">
         <header className="chat-app-topbar">
           <div>
-            <span className="chat-brand">@sportsdraft daily</span>
+            <span className="chat-brand">SportsDraft Daily Chat</span>
             <p className="chat-topbar-subtitle">One room for football and cricket fans.</p>
           </div>
           <div className="chat-topbar-icons" aria-hidden="true">
@@ -157,7 +157,7 @@ export function FanChatRoom({ initialMessages, user, openReports }: { initialMes
             <div className="chat-room-canvas">
               <div className="chat-room-intro">
                 <span className="chat-room-eyebrow">Sports fan chat</span>
-                <h1>Talk like a real live chatbox.</h1>
+                <h1>Live fan chat made for this site.</h1>
                 <p>
                   Join the common room, react to the latest football or cricket action, and report bad behaviour fast.
                   Your phone number stays hidden from other fans and is only visible to admins for moderation.
@@ -166,7 +166,7 @@ export function FanChatRoom({ initialMessages, user, openReports }: { initialMes
 
               <div className="chat-room-status">
                 <span className="chat-room-pill">Realtime updates</span>
-                <span className="chat-room-pill">Safe reporting</span>
+                <span className="chat-room-pill">Moderated room</span>
                 <span className="chat-room-pill">History clears daily</span>
                 {latestMessage ? <span className="chat-room-pill">Latest post {formatMessageTime(latestMessage.createdAt).short}</span> : null}
               </div>
@@ -239,18 +239,11 @@ export function FanChatRoom({ initialMessages, user, openReports }: { initialMes
             <footer className="chat-composer-shell">
               {user ? (
                 <form className="chat-composer-bar" onSubmit={sendMessage}>
-                  <button type="button" className="chat-action-button chat-action-muted">ESC</button>
-                  <button type="button" className="chat-action-button chat-action-primary">SKIP</button>
-                  <div className="chat-input-frame">
-                    <span className="chat-input-icon" aria-hidden="true">▣</span>
-                    <textarea className="input chat-dark-input chat-composer-input" placeholder="Send a message" value={text} onChange={(e) => setText(e.target.value)} maxLength={400} />
-                    <div className="chat-composer-tools">
-                      <span>{text.length}/400</span>
-                      <span>GIF</span>
-                      <span>☺</span>
-                    </div>
-                  </div>
-                  <button className="button chat-send-button" disabled={busy === 'send' || text.trim().length === 0}>{busy === 'send' ? 'Sending…' : 'Send'}</button>
+                  <label className="chat-input-frame">
+                    <span className="chat-input-icon" aria-hidden="true">✎</span>
+                    <textarea className="input chat-dark-input chat-composer-input" placeholder="Share your match reaction, opinion, or banter" value={text} onChange={(e) => setText(e.target.value)} />
+                  </label>
+                  <button className="button chat-send-button" disabled={busy === 'send' || text.trim().length === 0}>{busy === 'send' ? 'Sending…' : 'Post message'}</button>
                 </form>
               ) : (
                 <div className="chat-composer-locked">Join the room above to start posting messages and reporting abuse.</div>
