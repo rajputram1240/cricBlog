@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.js",
     "predev": "prisma generate",
     "build": "prisma generate && prisma db push && next build",
-    "start": "next start",
+    "start": "NODE_ENV=production node server.js",
     "lint": "next lint",
     "seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate"
