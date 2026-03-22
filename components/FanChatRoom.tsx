@@ -9,6 +9,18 @@ function getChatSocketUrl() {
   return `${protocol}//${window.location.host}/api/chat/socket`;
 }
 
+function formatMessageTime(value: string) {
+  const date = new Date(value);
+  return {
+    full: date.toLocaleString(),
+    short: date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+  };
+}
+
+function getInitial(name: string) {
+  return name.trim().charAt(0).toUpperCase() || 'F';
+}
+
 export function FanChatRoom({ initialMessages, user, openReports }: { initialMessages: any[]; user: any; openReports: number }) {
   const router = useRouter();
   const [messages, setMessages] = useState(initialMessages);
@@ -62,6 +74,8 @@ export function FanChatRoom({ initialMessages, user, openReports }: { initialMes
   }, []);
 
   const sortedMessages = useMemo(() => [...messages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()), [messages]);
+  const latestMessage = sortedMessages.at(-1);
+  const messageCount = sortedMessages.length;
 
   async function login(e: React.FormEvent) {
     e.preventDefault();
@@ -106,84 +120,143 @@ export function FanChatRoom({ initialMessages, user, openReports }: { initialMes
   }
 
   return (
-    <main className="shell page-section chat-shell">
-      <section className="hero panel chat-hero">
-        <div>
-          <span className="kicker">Daily fan chat</span>
-          <h1>One common sports chat for daily fan fun.</h1>
-          <p>Fans can join with only their name and phone number, talk about football or cricket all day, and report abusive or sexual content so the admin can remove messages or block accounts. The room resets automatically every morning at 10:00 UTC.</p>
-          <div className="inline-actions">
-            <span className="utility-chip">Open reports: {reportCount}</span>
-            <span className="utility-chip">Messages reset daily at 10:00 UTC</span>
-          </div>
-        </div>
-        {user ? (
-          <div className="panel chat-auth-card">
-            <span className="kicker">You are chatting as</span>
-            <strong>{user.name}</strong>
-            <span className="muted-text">Your phone number is hidden from other fans and visible only inside admin moderation tools.</span>
-            <button className="button button-secondary" onClick={logout} disabled={busy === 'logout'}>{busy === 'logout' ? 'Leaving…' : 'Leave chat'}</button>
-          </div>
-        ) : (
-          <form className="panel form-stack chat-auth-card" onSubmit={login}>
-            <span className="kicker">Join the room</span>
-            <input className="input" placeholder="Your name" value={auth.name} onChange={(e) => setAuth((current) => ({ ...current, name: e.target.value }))} />
-            <input className="input" placeholder="Phone number" type="tel" value={auth.phone} onChange={(e) => setAuth((current) => ({ ...current, phone: e.target.value }))} />
-            <div className="notice-banner">Other fans only see your name. Admin can see your phone number for moderation and blocking decisions.</div>
-            <button className="button button-primary" disabled={busy === 'login'}>{busy === 'login' ? 'Joining…' : 'Join fan chat'}</button>
-          </form>
-        )}
-      </section>
-
-      <section className="grid-2 page-section chat-grid">
-        <article className="panel form-stack">
-          <span className="kicker">Chat rules</span>
-          <ul className="muted-text ticket-rules">
-            <li>Use the room for sports fan fun, banter, reactions, and match talk.</li>
-            <li>Abusive, hateful, threatening, or sexual content can be reported by any fan.</li>
-            <li>Admin may delete a single bad message or block the user completely.</li>
-            <li>Every morning at 10:00 UTC the old chat history is automatically deleted.</li>
-          </ul>
-        </article>
-
-        <article className="panel form-stack">
-          <span className="kicker">Send a message</span>
-          {user ? (
-            <form className="form-stack" onSubmit={sendMessage}>
-              <textarea className="input" placeholder="Talk about today’s matches, players, banter, or fan moments" value={text} onChange={(e) => setText(e.target.value)} />
-              <button className="button button-primary" disabled={busy === 'send'}>{busy === 'send' ? 'Sending…' : 'Post message'}</button>
-            </form>
-          ) : <div className="notice-banner">Join the chat first to post or report messages.</div>}
-        </article>
-      </section>
-
-      <section className="panel page-section form-stack">
-        <div className="section-heading compact-heading">
+    <main className="shell page-section chat-shell chat-app-shell">
+      <section className="chat-app-frame">
+        <header className="chat-app-topbar">
           <div>
-            <span className="kicker">Live room</span>
-            <h2>Today's fan chat stream.</h2>
+            <span className="chat-brand">@sportsdraft daily</span>
+            <p className="chat-topbar-subtitle">One room for football and cricket fans.</p>
           </div>
-        </div>
-        <div className="chat-message-list">
-          {sortedMessages.map((message) => (
-            <article key={message.id} className="chat-message-card">
-              <div className="chat-message-head">
-                <div>
-                  <strong>{message.user.name}</strong>
-                  <div className="muted-text">{new Date(message.createdAt).toLocaleString()}</div>
-                </div>
-                {message.reportCount > 0 ? <span className="badge badge-pending">{message.reportCount} reports</span> : null}
+          <div className="chat-topbar-icons" aria-hidden="true">
+            <span className="chat-icon-dot" />
+            <span className="chat-icon-dot" />
+            <span className="chat-icon-dot" />
+          </div>
+        </header>
+
+        <div className="chat-app-body">
+          <aside className="chat-app-sidebar">
+            <div className="chat-sidebar-badge">Live</div>
+            <div className="chat-sidebar-stack">
+              <div className="chat-sidebar-card">
+                <span className="chat-sidebar-label">Messages</span>
+                <strong>{messageCount}</strong>
               </div>
-              <p>{message.text}</p>
-              {user && message.canReport ? (
-                <div className="form-stack chat-report-box">
-                  <input className="input" placeholder="Reason for report" value={reportReason[message.id] || ''} onChange={(e) => setReportReason((current) => ({ ...current, [message.id]: e.target.value }))} />
-                  <button className="button button-secondary" onClick={() => reportMessage(message.id)} disabled={busy === `report-${message.id}`}>{busy === `report-${message.id}` ? 'Reporting…' : 'Report message'}</button>
-                </div>
+              <div className="chat-sidebar-card">
+                <span className="chat-sidebar-label">Reports</span>
+                <strong>{reportCount}</strong>
+              </div>
+              <div className="chat-sidebar-card">
+                <span className="chat-sidebar-label">Reset</span>
+                <strong>10:00 UTC</strong>
+              </div>
+            </div>
+          </aside>
+
+          <section className="chat-room-panel">
+            <div className="chat-room-canvas">
+              <div className="chat-room-intro">
+                <span className="chat-room-eyebrow">Sports fan chat</span>
+                <h1>Talk like a real live chatbox.</h1>
+                <p>
+                  Join the common room, react to the latest football or cricket action, and report bad behaviour fast.
+                  Your phone number stays hidden from other fans and is only visible to admins for moderation.
+                </p>
+              </div>
+
+              <div className="chat-room-status">
+                <span className="chat-room-pill">Realtime updates</span>
+                <span className="chat-room-pill">Safe reporting</span>
+                <span className="chat-room-pill">History clears daily</span>
+                {latestMessage ? <span className="chat-room-pill">Latest post {formatMessageTime(latestMessage.createdAt).short}</span> : null}
+              </div>
+
+              {!user ? (
+                <form className="chat-join-card" onSubmit={login}>
+                  <div>
+                    <span className="kicker">Join the room</span>
+                    <h2 className="chat-card-title">Start chatting in under a minute.</h2>
+                  </div>
+                  <label className="form-field">
+                    <span>Display name</span>
+                    <input className="input chat-dark-input" placeholder="Enter your chat name" value={auth.name} onChange={(e) => setAuth((current) => ({ ...current, name: e.target.value }))} />
+                  </label>
+                  <label className="form-field">
+                    <span>Phone number</span>
+                    <input className="input chat-dark-input" placeholder="Used only for moderation safety" type="tel" value={auth.phone} onChange={(e) => setAuth((current) => ({ ...current, phone: e.target.value }))} />
+                  </label>
+                  <div className="chat-helper-card">Other fans only see your display name. Admins can view your number only when they need to moderate abuse or block a user.</div>
+                  <button className="button chat-send-button" disabled={busy === 'login'}>{busy === 'login' ? 'Joining…' : 'Join fan chat'}</button>
+                </form>
               ) : null}
-            </article>
-          ))}
-          {sortedMessages.length === 0 ? <div className="empty-state">No messages yet. Start today's sports conversation.</div> : null}
+
+              <div className="chat-stream-wrap">
+                <div className="chat-stream-banner">
+                  <span>
+                    You are now chatting with <strong>{user.name}</strong>. Say hi!
+                  </span>
+                  <button className="button button-secondary chat-leave-button" onClick={logout} disabled={busy === 'logout'}>
+                    {busy === 'logout' ? 'Leaving…' : 'Leave'}
+                  </button>
+                </div>
+
+                <div className="chat-message-list chat-dark-message-list">
+                  {sortedMessages.length === 0 ? <div className="empty-state chat-empty-state">No messages yet. Join the room and kick off today&apos;s sports conversation.</div> : null}
+                  {sortedMessages.map((message) => {
+                    const timestamp = formatMessageTime(message.createdAt);
+
+                    return (
+                      <article key={message.id} className="chat-message-card chat-dark-message-card">
+                        <div className="chat-message-head">
+                          <div className="chat-message-identity">
+                            <div className="chat-avatar" aria-hidden="true">{getInitial(message.user.name)}</div>
+                            <div>
+                              <div className="chat-message-meta-row">
+                                <strong>{message.user.name}</strong>
+                                <span>{timestamp.short}</span>
+                              </div>
+                              <div className="muted-text chat-message-date">{timestamp.full}</div>
+                            </div>
+                          </div>
+                          {message.reportCount > 0 ? <span className="badge badge-pending">{message.reportCount} reports</span> : null}
+                        </div>
+                        <p className="chat-message-text">{message.text}</p>
+                        {user && message.canReport ? (
+                          <div className="form-stack chat-report-box chat-report-inline">
+                            <input className="input chat-dark-input" placeholder="Reason for report" value={reportReason[message.id] || ''} onChange={(e) => setReportReason((current) => ({ ...current, [message.id]: e.target.value }))} />
+                            <button className="button button-secondary" onClick={() => reportMessage(message.id)} disabled={busy === `report-${message.id}`}>
+                              {busy === `report-${message.id}` ? 'Reporting…' : 'Report'}
+                            </button>
+                          </div>
+                        ) : null}
+                      </article>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <footer className="chat-composer-shell">
+              {user ? (
+                <form className="chat-composer-bar" onSubmit={sendMessage}>
+                  <button type="button" className="chat-action-button chat-action-muted">ESC</button>
+                  <button type="button" className="chat-action-button chat-action-primary">SKIP</button>
+                  <div className="chat-input-frame">
+                    <span className="chat-input-icon" aria-hidden="true">▣</span>
+                    <textarea className="input chat-dark-input chat-composer-input" placeholder="Send a message" value={text} onChange={(e) => setText(e.target.value)} maxLength={400} />
+                    <div className="chat-composer-tools">
+                      <span>{text.length}/400</span>
+                      <span>GIF</span>
+                      <span>☺</span>
+                    </div>
+                  </div>
+                  <button className="button chat-send-button" disabled={busy === 'send' || text.trim().length === 0}>{busy === 'send' ? 'Sending…' : 'Send'}</button>
+                </form>
+              ) : (
+                <div className="chat-composer-locked">Join the room above to start posting messages and reporting abuse.</div>
+              )}
+            </footer>
+          </section>
         </div>
       </section>
     </main>
