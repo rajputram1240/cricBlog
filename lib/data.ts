@@ -3,6 +3,24 @@ import { prisma } from '@/lib/prisma';
 import { slugify } from '@/lib/utils';
 import { blogInputSchema } from '@/lib/validators';
 
+const siteContentDefaults: Record<string, { title: string; description: string; body: string }> = {
+  about: {
+    title: 'About SportsDraft Daily',
+    description: 'Learn how SportsDraft Daily publishes football and cricket coverage with an AI-assisted, admin-reviewed workflow.',
+    body: 'SportsDraft Daily is built for football and cricket fans who want fast, readable, and trustworthy updates. Every article starts with a strong newsroom workflow: draft generation, admin editing, image upload, quality review, and final publication. We combine speed and consistency so fans can discover breaking stories, match previews, analysis, and community-focused content in one place.',
+  },
+  privacy: {
+    title: 'Privacy Policy',
+    description: 'Understand how SportsDraft Daily handles reader privacy, contact information, and site security.',
+    body: 'We only collect the information needed to improve site performance, manage contact requests, and secure the platform. Draft content remains private inside the admin workflow until it is reviewed and published. We do not expose unpublished newsroom material to public readers, and we aim to keep data handling simple, clear, and responsible.',
+  },
+  partner: {
+    title: 'Partner With Us',
+    description: 'Explore sponsorship, branded content, and sports media collaboration opportunities with SportsDraft Daily.',
+    body: 'SportsDraft Daily works with brands, clubs, organizers, and media partners who want to reach passionate football and cricket audiences. Our admin workflow supports campaign planning, content uploads, review cycles, and final approval before launch. If you want to collaborate on branded stories, sponsored coverage, or fan community activations, this is the place to start.',
+  },
+};
+
 export async function getPublishedPosts(params?: { category?: string; query?: string; date?: string }) {
   const where = {
     status: BlogStatus.published,
@@ -38,15 +56,57 @@ export async function getPostBySlug(slug: string) {
   return prisma.blogPost.findUnique({ where: { slug }, include: { category: true, approvedBy: true } });
 }
 
+export async function getSiteContent(slug: keyof typeof siteContentDefaults | string) {
+  const entry = await prisma.siteContent.findUnique({ where: { slug } });
+  const fallback = siteContentDefaults[slug] || siteContentDefaults.about;
+
+  return entry || {
+    slug,
+    title: fallback.title,
+    description: fallback.description,
+    body: fallback.body,
+  };
+}
+
+export async function getAllSiteContent() {
+  const entries = await prisma.siteContent.findMany({ orderBy: { slug: 'asc' } });
+
+  return Object.entries(siteContentDefaults).map(([slug, fallback]) => {
+    const entry = entries.find((item) => item.slug === slug);
+    return entry || { slug, ...fallback };
+  });
+}
+
+export async function saveSiteContent(input: { slug: string; title: string; description: string; body: string }) {
+  const fallback = siteContentDefaults[input.slug] || siteContentDefaults.about;
+
+  return prisma.siteContent.upsert({
+    where: { slug: input.slug },
+    update: {
+      title: input.title || fallback.title,
+      description: input.description || fallback.description,
+      body: input.body || fallback.body,
+    },
+    create: {
+      slug: input.slug,
+      title: input.title || fallback.title,
+      description: input.description || fallback.description,
+      body: input.body || fallback.body,
+    },
+  });
+}
+
 export async function getAdminDashboardData() {
-  const [categories, posts] = await Promise.all([
+  const [categories, posts, siteContent] = await Promise.all([
     prisma.category.findMany({ orderBy: { name: 'asc' } }),
     prisma.blogPost.findMany({ include: { category: true }, orderBy: { updatedAt: 'desc' } }),
+    getAllSiteContent(),
   ]);
 
   return {
     categories,
     posts,
+    siteContent,
     stats: {
       total: posts.length,
       football: posts.filter((post) => post.category.slug === 'football').length,
