@@ -8,6 +8,9 @@ export function Header() {
         <nav className="nav-links">
           <Link href="/category/football">Football</Link>
           <Link href="/category/cricket">Cricket</Link>
+          <Link href="/#about">About us</Link>
+          <Link href="/#privacy">Privacy policy</Link>
+          <Link href="/#partner">Partner with us</Link>
           <Link href="/admin">Admin</Link>
         </nav>
       </div>
