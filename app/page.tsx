@@ -5,16 +5,16 @@ import { getPublishedPosts } from '@/lib/data';
 
 const highlights = [
   {
-    title: 'Matchday fast lane',
-    text: 'Quickly jump from headline stories to football and cricket coverage without digging through generic landing-page copy.',
+    title: 'Breaking in one scroll',
+    text: 'Lead stories, matchday buzz, and fan tools are surfaced above the fold so visitors instantly know where to go.',
   },
   {
-    title: 'Editor-backed breaking news',
-    text: 'Fast-moving sports coverage keeps the homepage fresh with major football and cricket developments worth reading.',
+    title: 'Built for football + cricket',
+    text: 'Dual-sport storytelling, category shortcuts, and featured reads make the landing page feel more focused and energetic.',
   },
   {
-    title: 'Useful for real fans',
-    text: 'Designed around what sports fans want most: match buzz, trending topics, latest stories, and clean category browsing.',
+    title: 'Reader-friendly discovery',
+    text: 'Cards, spotlight stats, and clear sections guide fans from hero to headlines without visual clutter.',
   },
 ];
 
@@ -24,12 +24,14 @@ const fanZones = [
     body: 'Premier League, Champions League, transfer watch, match previews, post-match analysis, and standout player updates.',
     href: '/category/football',
     label: 'Browse football',
+    accent: 'football-zone',
   },
   {
     title: 'Cricket center',
     body: 'International cricket, franchise leagues, squad updates, tactical breakdowns, and tournament momentum stories.',
     href: '/category/cricket',
     label: 'Browse cricket',
+    accent: 'cricket-zone',
   },
 ];
 
@@ -85,16 +87,16 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
 
   return (
     <main>
-      <section className="hero-shell sports-hero-shell">
-        <div className="shell page-section hero hero-landing sports-hero-grid">
+      <section className="hero-shell sports-hero-shell home-hero-shell">
+        <div className="shell page-section hero hero-landing sports-hero-grid home-hero-grid">
           <div className="hero-copy">
             <span className="kicker">Sports news hub</span>
             <div className="headline-stack">
               <span className="live-pill">Live style sports coverage</span>
-              <h1>Sportsy, useful, fan-first news for football and cricket readers.</h1>
+              <h1>Make every homepage visit feel like walking into a buzzing matchday newsroom.</h1>
             </div>
             <p>
-              Follow a homepage built for sports fans: strong matchday colors, quick category access, breaking-story energy, and headline-driven coverage that feels like a true football and cricket newsroom.
+              Discover football and cricket stories through a brighter, layered landing page with stronger hierarchy, spotlighted fan tools, and fast paths into the latest talking points.
             </p>
             <div className="hero-actions">
               <Link href="/category/football" className="button button-primary">Football news</Link>
@@ -110,42 +112,100 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
             </div>
           </div>
 
-          <div className="hero-scoreboard card">
-            <div className="card-body scoreboard-body">
-              <div className="scoreboard-top">
-                <span className="kicker">Fan dashboard</span>
-                <span className="scoreboard-tag">Top stories now</span>
-              </div>
-              <div className="score-lines">
-                <div className="score-line football-line">
-                  <div>
-                    <strong>Football</strong>
-                    <p className="muted-text">Transfer buzz, title races, tactical reads</p>
+          <div className="hero-side-stack">
+            <div className="hero-scoreboard card hero-glow-card">
+              <div className="card-body scoreboard-body">
+                <div className="scoreboard-top">
+                  <span className="kicker">Fan dashboard</span>
+                  <span className="scoreboard-tag">Top stories now</span>
+                </div>
+                <div className="score-lines">
+                  <div className="score-line football-line">
+                    <div>
+                      <strong>Football</strong>
+                      <p className="muted-text">Transfer buzz, title races, tactical reads</p>
+                    </div>
+                    <span>90&apos;</span>
                   </div>
-                  <span>90'</span>
-                </div>
-                <div className="score-line cricket-line">
-                  <div>
-                    <strong>Cricket</strong>
-                    <p className="muted-text">Series stories, squad calls, tournament pulse</p>
+                  <div className="score-line cricket-line">
+                    <div>
+                      <strong>Cricket</strong>
+                      <p className="muted-text">Series stories, squad calls, tournament pulse</p>
+                    </div>
+                    <span>50 ov</span>
                   </div>
-                  <span>50 ov</span>
+                </div>
+                <div className="feature-list">
+                  <div>
+                    <strong>Breaking headlines</strong>
+                    <p className="muted-text">Big match updates, transfer stories, and tournament buzz surfaced fast.</p>
+                  </div>
+                  <div>
+                    <strong>Matchday pulse</strong>
+                    <p className="muted-text">Follow previews, key moments, and post-match reaction across major fixtures.</p>
+                  </div>
+                  <div>
+                    <strong>Fan-first reads</strong>
+                    <p className="muted-text">Clean sports storytelling focused on football rivalries and cricket storylines.</p>
+                  </div>
                 </div>
               </div>
-              <div className="feature-list">
-                <div>
-                  <strong>Breaking headlines</strong>
-                  <p className="muted-text">Big match updates, transfer stories, and tournament buzz surfaced fast.</p>
-                </div>
-                <div>
-                  <strong>Matchday pulse</strong>
-                  <p className="muted-text">Follow previews, key moments, and post-match reaction across major fixtures.</p>
-                </div>
-                <div>
-                  <strong>Fan-first reads</strong>
-                  <p className="muted-text">Clean sports storytelling focused on football rivalries and cricket storylines.</p>
+            </div>
+
+            <div className="hero-stats-strip">
+              <div className="mini-stat card">
+                <div className="card-body">
+                  <span className="kicker">Coverage</span>
+                  <strong>{posts.length}</strong>
+                  <p className="muted-text">Stories available to explore right now.</p>
                 </div>
               </div>
+              <div className="mini-stat card">
+                <div className="card-body">
+                  <span className="kicker">Featured</span>
+                  <strong>{featuredPosts.length}</strong>
+                  <p className="muted-text">Top stories highlighted for fast reading.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="shell page-section home-overview-grid">
+        <div className="card sports-panel overview-panel">
+          <div className="card-body">
+            <div className="section-heading compact-section-heading">
+              <div>
+                <span className="kicker">Why this homepage feels better</span>
+                <h2>Sharper sections, stronger contrast, and a more premium first impression.</h2>
+              </div>
+            </div>
+            <div className="highlights-grid">
+              {highlights.map((item, index) => (
+                <article key={item.title} className="feature-card home-feature-card">
+                  <span className="feature-index">0{index + 1}</span>
+                  <h3>{item.title}</h3>
+                  <p className="muted-text">{item.text}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="card sports-panel quick-links-panel">
+          <div className="card-body">
+            <span className="kicker">Quick fan routes</span>
+            <h2 className="feature-title">Jump from the homepage to the experience you want.</h2>
+            <div className="fan-zone-grid home-fan-zone-grid">
+              {fanZones.map((zone) => (
+                <Link key={zone.title} href={zone.href} className={`fan-zone-card ${zone.accent}`}>
+                  <span className="kicker">{zone.label}</span>
+                  <h3>{zone.title}</h3>
+                  <p className="muted-text">{zone.body}</p>
+                  <span className="text-link">Open section →</span>
+                </Link>
+              ))}
             </div>
           </div>
         </div>
@@ -155,7 +215,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
         <SearchFilters defaultCategory={params.category} defaultQuery={params.q} defaultDate={params.date} />
       </section>
 
-      <section className="shell page-section">
+      <section className="shell page-section content-spotlight-section">
         <div className="section-heading">
           <div>
             <span className="kicker">Featured stories</span>
@@ -165,6 +225,28 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
         </div>
         <div id="featured-stories" className="grid-3">
           {featuredPosts.map((post) => <BlogCard key={post.id} post={post} />)}
+        </div>
+      </section>
+
+      <section className="shell page-section info-band-section">
+        <div className="section-heading">
+          <div>
+            <span className="kicker">Beyond the headlines</span>
+            <h2>Extra ways fans can engage with the platform.</h2>
+          </div>
+          <p className="muted-text section-copy">These sections add community, utility, and trust signals so the homepage feels full and purposeful.</p>
+        </div>
+        <div className="info-grid home-info-grid">
+          {infoSections.map((section) => (
+            <Link key={section.id} href={section.href} className="card info-card home-info-card">
+              <div className="card-body">
+                <span className="kicker">{section.kicker}</span>
+                <h3>{section.title}</h3>
+                <p className="muted-text">{section.body}</p>
+                <span className="text-link">Learn more →</span>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 
