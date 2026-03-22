@@ -5,17 +5,39 @@ import { getPublishedPosts } from '@/lib/data';
 
 const highlights = [
   {
-    title: 'Human-reviewed AI stories',
-    text: 'Every football and cricket article starts as an assisted draft, then goes through admin editing, image upload, and approval before it is published.',
+    title: 'Matchday fast lane',
+    text: 'Quickly jump from headline stories to football and cricket coverage without digging through generic landing-page copy.',
   },
   {
-    title: 'Fast discovery for readers',
-    text: 'Visitors can search breaking topics, browse by category, and quickly find match analysis, transfer news, and tournament updates.',
+    title: 'Editor-backed breaking news',
+    text: 'AI drafting helps the newsroom move fast, while admins still review, upload visuals, and approve every public article.',
   },
   {
-    title: 'Built for content partners',
-    text: 'Brands, clubs, and media partners can collaborate with the editorial team to publish campaigns, sponsored features, and audience-first sports stories.',
+    title: 'Useful for real fans',
+    text: 'Designed around what sports fans want most: match buzz, trending topics, latest stories, and clean category browsing.',
   },
+];
+
+const fanZones = [
+  {
+    title: 'Football focus',
+    body: 'Premier League, Champions League, transfer watch, match previews, post-match analysis, and standout player updates.',
+    href: '/category/football',
+    label: 'Browse football',
+  },
+  {
+    title: 'Cricket center',
+    body: 'International cricket, franchise leagues, squad updates, tactical breakdowns, and tournament momentum stories.',
+    href: '/category/cricket',
+    label: 'Browse cricket',
+  },
+];
+
+const usefulLinks = [
+  'Search by team, player, or topic',
+  'Filter by category and date',
+  'Read only published, reviewed content',
+  'Jump from home page to admin newsroom',
 ];
 
 const infoSections = [
@@ -42,42 +64,67 @@ const infoSections = [
 export default async function Home({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; date?: string }> }) {
   const params = await searchParams;
   const posts = await getPublishedPosts({ query: params.q, category: params.category, date: params.date });
+  const featuredPosts = posts.slice(0, 3);
 
   return (
     <main>
-      <section className="hero-shell">
-        <div className="shell page-section hero hero-landing">
+      <section className="hero-shell sports-hero-shell">
+        <div className="shell page-section hero hero-landing sports-hero-grid">
           <div className="hero-copy">
-            <span className="kicker">Daily Football & Cricket Coverage</span>
-            <h1>Attractive sports coverage powered by AI drafts, polished by editors, and ready for fans every day.</h1>
+            <span className="kicker">Sports news hub</span>
+            <div className="headline-stack">
+              <span className="live-pill">Live style sports coverage</span>
+              <h1>Sportsy, useful, fan-first news for football and cricket readers.</h1>
+            </div>
             <p>
-              Discover a smarter sports homepage with featured football and cricket stories, trusted editorial review, and an admin workflow that uploads content, adds visuals, and publishes only after approval.
+              Follow a homepage built for sports fans: strong matchday colors, quick category access, breaking-story energy, and a trusted admin workflow for generating, uploading, reviewing, and publishing content.
             </p>
             <div className="hero-actions">
-              <Link href="/admin" className="button button-primary">Open admin newsroom</Link>
-              <a href="#about" className="button button-secondary">Learn more</a>
+              <Link href="/category/football" className="button button-primary">Football news</Link>
+              <Link href="/category/cricket" className="button button-secondary">Cricket news</Link>
+              <Link href="/admin" className="button button-secondary">Admin upload desk</Link>
+            </div>
+            <div className="utility-list">
+              {usefulLinks.map((item) => (
+                <span key={item} className="utility-chip">{item}</span>
+              ))}
             </div>
           </div>
 
-          <div className="hero-panel card">
-            <div className="card-body">
-              <div className="eyebrow-row">
-                <span>Publishing workflow</span>
-                <span>Editor approved</span>
+          <div className="hero-scoreboard card">
+            <div className="card-body scoreboard-body">
+              <div className="scoreboard-top">
+                <span className="kicker">Fan dashboard</span>
+                <span className="scoreboard-tag">Updated newsroom flow</span>
               </div>
-              <h2 className="feature-title">Admin can generate, upload, review, and publish content from one place.</h2>
+              <div className="score-lines">
+                <div className="score-line football-line">
+                  <div>
+                    <strong>Football</strong>
+                    <p className="muted-text">Transfer buzz, title races, tactical reads</p>
+                  </div>
+                  <span>90'</span>
+                </div>
+                <div className="score-line cricket-line">
+                  <div>
+                    <strong>Cricket</strong>
+                    <p className="muted-text">Series stories, squad calls, tournament pulse</p>
+                  </div>
+                  <span>50 ov</span>
+                </div>
+              </div>
               <div className="feature-list">
                 <div>
                   <strong>Create draft</strong>
-                  <p className="muted-text">Start AI-assisted coverage for match previews, recaps, and transfer updates.</p>
+                  <p className="muted-text">Start football or cricket stories with AI-assisted speed.</p>
                 </div>
                 <div>
-                  <strong>Upload media</strong>
-                  <p className="muted-text">Add feature images and polish story summaries before anything goes live.</p>
+                  <strong>Upload content</strong>
+                  <p className="muted-text">Admins add images, improve summaries, and keep the visual experience sharp.</p>
                 </div>
                 <div>
-                  <strong>Approve with confidence</strong>
-                  <p className="muted-text">Keep all public content behind a review-first workflow for quality and consistency.</p>
+                  <strong>Publish for fans</strong>
+                  <p className="muted-text">Only reviewed content reaches the public homepage, categories, and story pages.</p>
                 </div>
               </div>
             </div>
@@ -88,13 +135,24 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
       <section className="shell page-section">
         <div className="highlights-grid">
           {highlights.map((item) => (
-            <article key={item.title} className="panel feature-card">
-              <span className="kicker">Why readers stay</span>
+            <article key={item.title} className="panel feature-card sports-panel">
+              <span className="kicker">Why fans stay</span>
               <h3>{item.title}</h3>
               <p className="muted-text">{item.text}</p>
             </article>
           ))}
         </div>
+      </section>
+
+      <section className="shell page-section fan-zone-grid">
+        {fanZones.map((zone) => (
+          <article key={zone.title} className="panel fan-zone-card">
+            <span className="kicker">Coverage zone</span>
+            <h2>{zone.title}</h2>
+            <p className="muted-text">{zone.body}</p>
+            <Link href={zone.href} className="text-link">{zone.label} →</Link>
+          </article>
+        ))}
       </section>
 
       <section className="shell page-section">
@@ -103,7 +161,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
 
       <section className="shell page-section info-grid">
         {infoSections.map((section) => (
-          <article key={section.id} id={section.id} className="panel info-card">
+          <article key={section.id} id={section.id} className="panel info-card sports-panel">
             <span className="kicker">{section.kicker}</span>
             <h2>{section.title}</h2>
             <p className="muted-text">{section.body}</p>
@@ -114,13 +172,26 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
       <section className="shell page-section">
         <div className="section-heading">
           <div>
-            <span className="kicker">Latest stories</span>
+            <span className="kicker">Featured stories</span>
+            <h2>Latest football and cricket stories ready for sports fans.</h2>
+          </div>
+          <p className="muted-text section-copy">Read the newest reviewed coverage below, then use search and category filters to find exactly what you want.</p>
+        </div>
+        <div className="grid-3">
+          {featuredPosts.map((post) => <BlogCard key={post.id} post={post} />)}
+        </div>
+      </section>
+
+      <section className="shell page-section">
+        <div className="section-heading">
+          <div>
+            <span className="kicker">More from the newsroom</span>
             <h2>Fresh football and cricket posts from the public newsroom.</h2>
           </div>
           <p className="muted-text section-copy">Use the search tools above to narrow stories by keyword, category, or publishing date.</p>
         </div>
         <div className="grid-3">
-          {posts.map((post) => <BlogCard key={post.id} post={post} />)}
+          {posts.slice(3).map((post) => <BlogCard key={post.id} post={post} />)}
         </div>
         {posts.length === 0 ? <div className="empty-state card">No published posts matched your filters.</div> : null}
       </section>
