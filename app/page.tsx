@@ -10,7 +10,7 @@ const highlights = [
   },
   {
     title: 'Editor-backed breaking news',
-    text: 'AI drafting helps the newsroom move fast, while admins still review, upload visuals, and approve every public article.',
+    text: 'Fast-moving sports coverage keeps the homepage fresh with major football and cricket developments worth reading.',
   },
   {
     title: 'Useful for real fans',
@@ -36,8 +36,8 @@ const fanZones = [
 const usefulLinks = [
   'Search by team, player, or topic',
   'Filter by category and date',
-  'Read only published, reviewed content',
-  'Jump from home page to admin newsroom',
+  'Catch the latest football and cricket stories',
+  'Move quickly between categories and headlines',
 ];
 
 const infoSections = [
@@ -46,7 +46,7 @@ const infoSections = [
     href: '/about',
     kicker: 'About us',
     title: 'A modern sports newsroom for football and cricket fans.',
-    body: 'SportsDraft Daily blends AI-assisted drafting with hands-on editorial checks so readers get timely updates without sacrificing quality. Our workflow helps the team move quickly while keeping every story aligned with newsroom standards.',
+    body: 'SportsDraft Daily delivers football and cricket coverage with a modern sports-news feel, combining quick updates, featured storylines, and easy browsing for fans who want the latest talking points.',
   },
   {
     id: 'privacy',
@@ -80,12 +80,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
               <h1>Sportsy, useful, fan-first news for football and cricket readers.</h1>
             </div>
             <p>
-              Follow a homepage built for sports fans: strong matchday colors, quick category access, breaking-story energy, and a trusted admin workflow for generating, uploading, reviewing, and publishing content.
+              Follow a homepage built for sports fans: strong matchday colors, quick category access, breaking-story energy, and headline-driven coverage that feels like a true football and cricket newsroom.
             </p>
             <div className="hero-actions">
               <Link href="/category/football" className="button button-primary">Football news</Link>
               <Link href="/category/cricket" className="button button-secondary">Cricket news</Link>
-              <Link href="/admin" className="button button-secondary">Admin upload desk</Link>
+              <Link href="/#featured-stories" className="button button-secondary">Top stories</Link>
             </div>
             <div className="utility-list">
               {usefulLinks.map((item) => (
@@ -98,7 +98,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
             <div className="card-body scoreboard-body">
               <div className="scoreboard-top">
                 <span className="kicker">Fan dashboard</span>
-                <span className="scoreboard-tag">Updated newsroom flow</span>
+                <span className="scoreboard-tag">Top stories now</span>
               </div>
               <div className="score-lines">
                 <div className="score-line football-line">
@@ -118,16 +118,16 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
               </div>
               <div className="feature-list">
                 <div>
-                  <strong>Create draft</strong>
-                  <p className="muted-text">Start football or cricket stories with AI-assisted speed.</p>
+                  <strong>Breaking headlines</strong>
+                  <p className="muted-text">Big match updates, transfer stories, and tournament buzz surfaced fast.</p>
                 </div>
                 <div>
-                  <strong>Upload content</strong>
-                  <p className="muted-text">Admins add images, improve summaries, and keep the visual experience sharp.</p>
+                  <strong>Matchday pulse</strong>
+                  <p className="muted-text">Follow previews, key moments, and post-match reaction across major fixtures.</p>
                 </div>
                 <div>
-                  <strong>Publish for fans</strong>
-                  <p className="muted-text">Only reviewed content reaches the public homepage, categories, and story pages.</p>
+                  <strong>Fan-first reads</strong>
+                  <p className="muted-text">Clean sports storytelling focused on football rivalries and cricket storylines.</p>
                 </div>
               </div>
             </div>
@@ -179,9 +179,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
             <span className="kicker">Featured stories</span>
             <h2>Latest football and cricket stories ready for sports fans.</h2>
           </div>
-          <p className="muted-text section-copy">Read the newest reviewed coverage below, then use search and category filters to find exactly what you want.</p>
+          <p className="muted-text section-copy">Read the newest football and cricket coverage below, then use search and category filters to find exactly what you want.</p>
         </div>
-        <div className="grid-3">
+        <div id="featured-stories" className="grid-3">
           {featuredPosts.map((post) => <BlogCard key={post.id} post={post} />)}
         </div>
       </section>
@@ -197,7 +197,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
         <div className="grid-3">
           {posts.slice(3).map((post) => <BlogCard key={post.id} post={post} />)}
         </div>
-        {posts.length === 0 ? <div className="empty-state card">No published posts matched your filters.</div> : null}
+        {posts.length === 0 ? <div className="empty-state card">No sports stories matched your filters.</div> : null}
       </section>
     </main>
   );
