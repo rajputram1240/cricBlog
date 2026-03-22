@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getFanSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { serializeTicketForViewer } from '@/lib/tickets';
 import { ticketSchema } from '@/lib/validators';
 
 export async function POST(request: Request) {
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
       include: { seller: true, bids: { include: { bidder: true }, orderBy: [{ amount: 'desc' }, { createdAt: 'asc' }] }, soldBid: { include: { bidder: true } } },
     });
 
-    return NextResponse.json({ ticket });
+    return NextResponse.json({ ticket: serializeTicketForViewer(ticket, fan.id) });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Unable to create ticket' }, { status: 400 });
   }

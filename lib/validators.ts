@@ -24,6 +24,7 @@ export const generateSchema = z.object({
 export const fanLoginSchema = z.object({
   name: z.string().min(2).max(60),
   email: z.string().email(),
+  phone: z.string().trim().regex(/^[0-9+()\-\s]{7,20}$/, 'Enter a valid phone number'),
 });
 
 export const ticketSchema = z.object({

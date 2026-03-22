@@ -53,11 +53,12 @@ export async function requireAdmin() {
   return admin;
 }
 
-export async function loginFan(name: string, email: string) {
+export async function loginFan(name: string, email: string, phone: string) {
+  const normalizedPhone = phone.trim();
   const fan = await prisma.fanUser.upsert({
     where: { email: email.toLowerCase() },
-    update: { name },
-    create: { name, email: email.toLowerCase() },
+    update: { name, phone: normalizedPhone },
+    create: { name, email: email.toLowerCase(), phone: normalizedPhone },
   });
 
   const store = await cookies();

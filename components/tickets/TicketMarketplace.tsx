@@ -7,7 +7,7 @@ export function TicketMarketplace({ initialTickets, fan, canCreateTicket, limitR
   const router = useRouter();
   const [tickets, setTickets] = useState(initialTickets);
   const [busy, setBusy] = useState('');
-  const [auth, setAuth] = useState({ name: '', email: '' });
+  const [auth, setAuth] = useState({ name: '', email: '', phone: '' });
   const [ticketForm, setTicketForm] = useState({ matchTitle: '', venue: '', matchDate: '', seatDetails: '', basePrice: '', description: '' });
   const [bidForms, setBidForms] = useState<Record<string, { amount: string; comment: string; rewardNote: string }>>({});
 
@@ -94,13 +94,14 @@ export function TicketMarketplace({ initialTickets, fan, canCreateTicket, limitR
         <div>
           <span className="kicker">Fan ticket exchange</span>
           <h1>Login, list one match ticket per day, collect bids, and sell to the best cricket fan offer.</h1>
-          <p>Fans can post a single upcoming-match ticket, let buyers comment with auction-style offers, remove the listing before it is sold, then reward standout bidders after the seller chooses a winner.</p>
+          <p>Fans can post a single upcoming-match ticket, let buyers comment with auction-style offers, remove the listing before it is sold, then exchange phone numbers only after the seller confirms the winning buyer.</p>
         </div>
         {fan ? (
           <div className="panel ticket-user-card">
             <span className="kicker">Logged in fan</span>
             <strong>{fan.name}</strong>
             <span className="muted-text">{fan.email}</span>
+            <span className="muted-text">Phone: {fan.phone || 'Add a phone number next login to unlock confirmed-buyer contact sharing.'}</span>
             <button className="button button-secondary" onClick={logout} disabled={busy === 'logout'}>{busy === 'logout' ? 'Logging out…' : 'Logout'}</button>
           </div>
         ) : (
@@ -108,6 +109,8 @@ export function TicketMarketplace({ initialTickets, fan, canCreateTicket, limitR
             <span className="kicker">Fan login</span>
             <input className="input" placeholder="Your name" value={auth.name} onChange={(e) => setAuth((current) => ({ ...current, name: e.target.value }))} />
             <input className="input" placeholder="Email address" type="email" value={auth.email} onChange={(e) => setAuth((current) => ({ ...current, email: e.target.value }))} />
+            <input className="input" placeholder="Phone number" type="tel" value={auth.phone} onChange={(e) => setAuth((current) => ({ ...current, phone: e.target.value }))} />
+            <div className="notice-banner">Phone numbers stay hidden during bidding and are only shared with the seller and winning buyer after the auction is confirmed.</div>
             <button className="button button-primary" disabled={busy === 'login'}>{busy === 'login' ? 'Signing in…' : 'Login as fan'}</button>
           </form>
         )}
@@ -139,7 +142,7 @@ export function TicketMarketplace({ initialTickets, fan, canCreateTicket, limitR
             <li>One active listing per fan is enforced, with one ticket listing allowed each day until it is sold or deleted.</li>
             <li>Interested buyers can comment with bid amounts and short notes.</li>
             <li>Sellers can delete unsold listings whenever they do not like the auction price.</li>
-            <li>When a seller picks the winning bid, the ticket is marked sold and other bidders can be rewarded.</li>
+            <li>When a seller picks the winning bid, the ticket is marked sold and both sides instantly see each other&apos;s phone numbers.</li>
           </ul>
         </article>
       </section>
@@ -155,6 +158,8 @@ export function TicketMarketplace({ initialTickets, fan, canCreateTicket, limitR
           {sortedTickets.map((ticket) => {
             const topBid = ticket.bids[0];
             const isSeller = fan?.id === ticket.sellerId;
+            const isWinningBuyer = fan?.id && ticket.soldBid?.bidderId === fan.id;
+            const canViewContactDetails = Boolean(ticket.soldBid && (isSeller || isWinningBuyer));
             const isOpen = ticket.status === 'open';
             const form = bidForms[ticket.id] || { amount: '', comment: '', rewardNote: '' };
             return (
@@ -179,6 +184,7 @@ export function TicketMarketplace({ initialTickets, fan, canCreateTicket, limitR
                     <span className="kicker">Seller</span>
                     <strong>{ticket.seller.name}</strong>
                     <span className="muted-text">{ticket.seller.email}</span>
+                    <span className="muted-text">{canViewContactDetails ? `Phone: ${ticket.seller.phone || 'Not provided yet'}` : 'Phone hidden until a winner is confirmed'}</span>
                   </div>
                   <div className="panel subtle-panel">
                     <span className="kicker">Auction pulse</span>
@@ -195,21 +201,27 @@ export function TicketMarketplace({ initialTickets, fan, canCreateTicket, limitR
                 ) : null}
 
                 <div className="ticket-bids">
-                  {ticket.bids.map((bid: any) => (
-                    <div key={bid.id} className="bid-row">
-                      <div>
-                        <strong>{bid.bidder.name}</strong>
-                        <span className="muted-text"> offered ₹{bid.amount.toFixed(0)}</span>
-                        <p className="muted-text">{bid.comment}</p>
-                        <div className="inline-actions">
-                          {bid.isWinningBid ? <span className="badge badge-published">Winning bid</span> : null}
-                          {bid.isRewarded ? <span className="badge badge-approved">Rewarded by seller</span> : null}
+                  {ticket.bids.map((bid: any) => {
+                    const isWinningBidder = bid.isWinningBid && fan?.id === bid.bidderId;
+                    const showBidderPhone = bid.isWinningBid && (isSeller || isWinningBidder);
+
+                    return (
+                      <div key={bid.id} className="bid-row">
+                        <div>
+                          <strong>{bid.bidder.name}</strong>
+                          <span className="muted-text"> offered ₹{bid.amount.toFixed(0)}</span>
+                          <p className="muted-text">{bid.comment}</p>
+                          <div className="inline-actions">
+                            {bid.isWinningBid ? <span className="badge badge-published">Winning bid</span> : null}
+                            {bid.isRewarded ? <span className="badge badge-approved">Rewarded by seller</span> : null}
+                          </div>
+                          {showBidderPhone ? <p className="muted-text">Buyer phone: {bid.bidder.phone || 'Not provided yet'}</p> : null}
                         </div>
+                        {isSeller && isOpen ? <button className="button button-success" onClick={() => closeAuction(ticket.id, bid.id)} disabled={busy === `close-${ticket.id}`}>{busy === `close-${ticket.id}` ? 'Closing…' : 'Sell to this fan'}</button> : null}
+                        {isSeller && !isOpen && !bid.isWinningBid && !bid.isRewarded ? <button className="button button-secondary" onClick={() => rewardBid(ticket.id, bid.id)} disabled={busy === `reward-${bid.id}`}>{busy === `reward-${bid.id}` ? 'Rewarding…' : 'Reward bidder'}</button> : null}
                       </div>
-                      {isSeller && isOpen ? <button className="button button-success" onClick={() => closeAuction(ticket.id, bid.id)} disabled={busy === `close-${ticket.id}`}>{busy === `close-${ticket.id}` ? 'Closing…' : 'Sell to this fan'}</button> : null}
-                      {isSeller && !isOpen && !bid.isWinningBid && !bid.isRewarded ? <button className="button button-secondary" onClick={() => rewardBid(ticket.id, bid.id)} disabled={busy === `reward-${bid.id}`}>{busy === `reward-${bid.id}` ? 'Rewarding…' : 'Reward bidder'}</button> : null}
-                    </div>
-                  ))}
+                    );
+                  })}
                   {ticket.bids.length === 0 ? <div className="empty-state">No buyer comments yet.</div> : null}
                 </div>
 
@@ -221,7 +233,7 @@ export function TicketMarketplace({ initialTickets, fan, canCreateTicket, limitR
                   </form>
                 ) : null}
 
-                {!isOpen && ticket.soldBid ? <div className="notice-banner">Sold to {ticket.soldBid.bidder.name} for ₹{ticket.soldBid.amount.toFixed(0)}.{ticket.sellerRewardNote ? ` Reward note: ${ticket.sellerRewardNote}` : ''}</div> : null}
+                {!isOpen && ticket.soldBid ? <div className="notice-banner">Sold to {ticket.soldBid.bidder.name} for ₹{ticket.soldBid.amount.toFixed(0)}. {canViewContactDetails ? `Call seller at ${ticket.seller.phone || 'not provided'} and buyer at ${ticket.soldBid.bidder.phone || 'not provided'} to complete the handoff.` : 'Phone numbers are visible only to the seller and confirmed buyer.'}{ticket.sellerRewardNote ? ` Reward note: ${ticket.sellerRewardNote}` : ''}</div> : null}
               </article>
             );
           })}

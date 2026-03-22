@@ -76,6 +76,7 @@ model FanUser {
   id          String       @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   email       String       @unique
+  phone       String?
   tickets     MatchTicket[]
   bids        TicketBid[]  @relation("BidderBids")
   rewards     TicketBid[]  @relation("RewardedBids")
