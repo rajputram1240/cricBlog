@@ -38,7 +38,16 @@ const simpleLinks = [
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; date?: string }> }) {
   const params = await searchParams;
-  const posts = await getPublishedPosts({ query: params.q, category: params.category, date: params.date });
+
+  let posts: Awaited<ReturnType<typeof getPublishedPosts>> = [];
+  let dataWarning: string | null = null;
+
+  try {
+    posts = await getPublishedPosts({ query: params.q, category: params.category, date: params.date });
+  } catch {
+    dataWarning = 'Stories are temporarily unavailable because the database connection is not configured yet.';
+  }
+
   const featuredPosts = posts.slice(0, 3);
   const morePosts = posts.slice(3, 9);
 
@@ -89,19 +98,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
                 ))}
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="shell page-section home-overview-grid">
-        <div className="card sports-panel overview-panel">
-          <div className="card-body">
-            <div className="section-heading compact-section-heading">
-              <div>
-                <span className="kicker">Why this homepage feels better</span>
-                <h2>Sharper sections, stronger contrast, and a more premium first impression.</h2>
-              </div>
-            </div>
             <div className="highlights-grid">
               {highlights.map((item, index) => (
                 <article key={item.title} className="feature-card home-feature-card">
@@ -131,6 +127,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
           </div>
         </div>
       </section>
+
+      {dataWarning ? (
+        <section className="shell page-section">
+          <div className="notice-banner">{dataWarning}</div>
+        </section>
+      ) : null}
 
       <section className="shell page-section">
         <SearchFilters defaultCategory={params.category} defaultQuery={params.q} defaultDate={params.date} />
