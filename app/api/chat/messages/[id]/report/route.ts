@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { ChatReportStatus } from '@prisma/client';
 import { getChatUserSession } from '@/lib/auth';
 import { getChatRoomData } from '@/lib/chat';
+import { publishChatUpdate } from '@/lib/chat-events';
 import { prisma } from '@/lib/prisma';
 import { chatReportSchema } from '@/lib/validators';
 
@@ -22,6 +23,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
       create: { messageId: id, reporterId: user.id, reportedUserId: message.userId, reason: body.reason },
     });
 
+    publishChatUpdate();
     const data = await getChatRoomData(user.id);
     return NextResponse.json(data);
   } catch (error: any) {

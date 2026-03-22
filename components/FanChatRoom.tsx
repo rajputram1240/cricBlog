@@ -1,15 +1,44 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export function FanChatRoom({ initialMessages, user, openReports }: { initialMessages: any[]; user: any; openReports: number }) {
   const router = useRouter();
   const [messages, setMessages] = useState(initialMessages);
+  const [reportCount, setReportCount] = useState(openReports);
   const [auth, setAuth] = useState({ name: '', phone: '' });
   const [text, setText] = useState('');
   const [reportReason, setReportReason] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState('');
+
+  useEffect(() => {
+    setMessages(initialMessages);
+  }, [initialMessages]);
+
+  useEffect(() => {
+    setReportCount(openReports);
+  }, [openReports]);
+
+  useEffect(() => {
+    const eventSource = new EventSource('/api/chat/stream');
+
+    async function refreshMessages() {
+      const response = await fetch('/api/chat/messages', { cache: 'no-store' });
+      if (!response.ok) return;
+      const data = await response.json();
+      setMessages(data.messages);
+      setReportCount(data.openReports);
+    }
+
+    eventSource.onmessage = () => {
+      void refreshMessages();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, []);
 
   const sortedMessages = useMemo(() => [...messages].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()), [messages]);
 
@@ -39,6 +68,7 @@ export function FanChatRoom({ initialMessages, user, openReports }: { initialMes
     if (!response.ok) return alert(data.error || 'Unable to send message');
     setText('');
     setMessages(data.messages);
+    setReportCount(data.openReports);
   }
 
   async function reportMessage(id: string) {
@@ -49,6 +79,7 @@ export function FanChatRoom({ initialMessages, user, openReports }: { initialMes
     setBusy('');
     if (!response.ok) return alert(data.error || 'Unable to report message');
     setMessages(data.messages);
+    setReportCount(data.openReports);
     setReportReason((current) => ({ ...current, [id]: '' }));
     alert('Report sent to admin for review.');
   }
@@ -61,7 +92,7 @@ export function FanChatRoom({ initialMessages, user, openReports }: { initialMes
           <h1>One common sports chat for daily fan fun.</h1>
           <p>Fans can join with only their name and phone number, talk about football or cricket all day, and report abusive or sexual content so the admin can remove messages or block accounts. The room resets automatically every morning at 10:00 UTC.</p>
           <div className="inline-actions">
-            <span className="utility-chip">Open reports: {openReports}</span>
+            <span className="utility-chip">Open reports: {reportCount}</span>
             <span className="utility-chip">Messages reset daily at 10:00 UTC</span>
           </div>
         </div>
@@ -109,7 +140,7 @@ export function FanChatRoom({ initialMessages, user, openReports }: { initialMes
         <div className="section-heading compact-heading">
           <div>
             <span className="kicker">Live room</span>
-            <h2>Today&apos;s fan chat stream.</h2>
+            <h2>Today's fan chat stream.</h2>
           </div>
         </div>
         <div className="chat-message-list">
@@ -131,7 +162,7 @@ export function FanChatRoom({ initialMessages, user, openReports }: { initialMes
               ) : null}
             </article>
           ))}
-          {sortedMessages.length === 0 ? <div className="empty-state">No messages yet. Start today&apos;s sports conversation.</div> : null}
+          {sortedMessages.length === 0 ? <div className="empty-state">No messages yet. Start today's sports conversation.</div> : null}
         </div>
       </section>
     </main>
