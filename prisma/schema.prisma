@@ -20,6 +20,12 @@ enum TicketStatus {
   sold
 }
 
+enum ChatReportStatus {
+  open
+  actioned
+  dismissed
+}
+
 model Admin {
   id            String     @id @default(auto()) @map("_id") @db.ObjectId
   name          String
@@ -85,38 +91,87 @@ model FanUser {
 }
 
 model MatchTicket {
-  id              String       @id @default(auto()) @map("_id") @db.ObjectId
-  sellerId        String       @db.ObjectId
-  seller          FanUser      @relation(fields: [sellerId], references: [id])
-  matchTitle      String
-  venue           String
-  matchDate       DateTime
-  seatDetails     String
-  basePrice       Float
-  description     String
-  status          TicketStatus @default(open)
-  soldBidId       String?      @db.ObjectId
-  soldBid         TicketBid?   @relation("SoldBid", fields: [soldBidId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  bids            TicketBid[]  @relation("TicketBids")
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
-  soldAt          DateTime?
+  id               String       @id @default(auto()) @map("_id") @db.ObjectId
+  sellerId         String       @db.ObjectId
+  seller           FanUser      @relation(fields: [sellerId], references: [id])
+  matchTitle       String
+  venue            String
+  matchDate        DateTime
+  seatDetails      String
+  basePrice        Float
+  description      String
+  status           TicketStatus @default(open)
+  soldBidId        String?      @db.ObjectId
+  soldBid          TicketBid?   @relation("SoldBid", fields: [soldBidId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  bids             TicketBid[]  @relation("TicketBids")
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  soldAt           DateTime?
   sellerRewardNote String?
 }
 
 model TicketBid {
-  id            String      @id @default(auto()) @map("_id") @db.ObjectId
-  ticketId      String      @db.ObjectId
-  ticket        MatchTicket @relation("TicketBids", fields: [ticketId], references: [id])
-  bidderId      String      @db.ObjectId
-  bidder        FanUser     @relation("BidderBids", fields: [bidderId], references: [id])
-  amount        Float
-  comment       String
-  isWinningBid  Boolean     @default(false)
-  isRewarded    Boolean     @default(false)
-  rewardedById  String?     @db.ObjectId
-  rewardedBy    FanUser?    @relation("RewardedBids", fields: [rewardedById], references: [id])
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  soldTicket    MatchTicket[] @relation("SoldBid")
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  ticketId     String        @db.ObjectId
+  ticket       MatchTicket   @relation("TicketBids", fields: [ticketId], references: [id])
+  bidderId     String        @db.ObjectId
+  bidder       FanUser       @relation("BidderBids", fields: [bidderId], references: [id])
+  amount       Float
+  comment      String
+  isWinningBid Boolean       @default(false)
+  isRewarded   Boolean       @default(false)
+  rewardedById String?       @db.ObjectId
+  rewardedBy   FanUser?      @relation("RewardedBids", fields: [rewardedById], references: [id])
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  soldTicket   MatchTicket[] @relation("SoldBid")
+}
+
+model ChatUser {
+  id           String        @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  phone        String        @unique
+  isBlocked    Boolean       @default(false)
+  blockReason  String?
+  messages     ChatMessage[]
+  reportsMade  ChatReport[]  @relation("ReporterReports")
+  reportsOnMe  ChatReport[]  @relation("ReportedUserReports")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model ChatMessage {
+  id          String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String       @db.ObjectId
+  user        ChatUser     @relation(fields: [userId], references: [id])
+  text        String
+  isDeleted   Boolean      @default(false)
+  reports     ChatReport[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model ChatReport {
+  id              String           @id @default(auto()) @map("_id") @db.ObjectId
+  messageId       String           @db.ObjectId
+  message         ChatMessage      @relation(fields: [messageId], references: [id])
+  reporterId      String           @db.ObjectId
+  reporter        ChatUser         @relation("ReporterReports", fields: [reporterId], references: [id])
+  reportedUserId  String           @db.ObjectId
+  reportedUser    ChatUser         @relation("ReportedUserReports", fields: [reportedUserId], references: [id])
+  reason          String
+  status          ChatReportStatus @default(open)
+  adminNote       String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@unique([messageId, reporterId])
+}
+
+model ChatCleanupState {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  key           String   @unique
+  lastCleanupAt DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

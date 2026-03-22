@@ -69,6 +69,13 @@ const infoSections = [
     title: 'Fans can list upcoming cricket tickets, collect bids, and sell to the best offer.',
     body: 'The new fan exchange lets supporters log in, post one ticket per day, accept auction-style comments from buyers, delete weak listings, and reward standout bidders after the sale.',
   },
+  {
+    id: 'fan-chat',
+    href: '/fan-chat',
+    kicker: 'Fan chat',
+    title: 'One shared sports chat for daily banter with reporting and admin moderation.',
+    body: 'Fans join the common chat using only a name and phone number, while admins can review reports, hide abusive or sexual messages, block repeat offenders, and let the room auto-reset every morning at 10:00 UTC.',
+  },
 ];
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ q?: string; category?: string; date?: string }> }) {
@@ -93,6 +100,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
               <Link href="/category/football" className="button button-primary">Football news</Link>
               <Link href="/category/cricket" className="button button-secondary">Cricket news</Link>
               <Link href="/tickets" className="button button-secondary">Ticket auction</Link>
+              <Link href="/fan-chat" className="button button-secondary">Fan chat</Link>
               <Link href="/#featured-stories" className="button button-secondary">Top stories</Link>
             </div>
             <div className="utility-list">

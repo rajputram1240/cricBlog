@@ -27,6 +27,25 @@ export const fanLoginSchema = z.object({
   phone: z.string().trim().regex(/^[0-9+()\-\s]{7,20}$/, 'Enter a valid phone number'),
 });
 
+
+export const chatLoginSchema = z.object({
+  name: z.string().min(2).max(60),
+  phone: z.string().trim().regex(/^[0-9+()\-\s]{7,20}$/, 'Enter a valid phone number'),
+});
+
+export const chatMessageSchema = z.object({
+  text: z.string().trim().min(2).max(500),
+});
+
+export const chatReportSchema = z.object({
+  reason: z.string().trim().min(8).max(240),
+});
+
+export const adminChatActionSchema = z.object({
+  action: z.enum(['delete_message', 'block_user', 'dismiss_report']),
+  reason: z.string().trim().max(240).optional().or(z.literal('')),
+});
+
 export const ticketSchema = z.object({
   matchTitle: z.string().min(5).max(120),
   venue: z.string().min(3).max(120),
