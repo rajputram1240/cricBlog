@@ -229,3 +229,16 @@ th, td { padding: 0.9rem 0.75rem; text-align: left; border-bottom: 1px solid var
   .ticket-card-head, .bid-row { flex-direction: column; }
   .ticket-price-box { text-align: left; }
 }
+.chat-shell { display: grid; gap: 1rem; }
+.chat-hero { display: grid; grid-template-columns: 2fr 1fr; gap: 1.25rem; align-items: start; }
+.chat-auth-card { min-height: 100%; }
+.chat-grid { align-items: start; }
+.chat-message-list { display: grid; gap: 1rem; }
+.chat-message-card { border: 1px solid var(--line); border-radius: 20px; padding: 1rem; background: rgba(255, 247, 237, 0.85); display: grid; gap: 0.85rem; }
+.chat-message-head { display: flex; justify-content: space-between; gap: 1rem; align-items: start; }
+.chat-report-box { border-top: 1px solid var(--line); padding-top: 0.85rem; }
+.admin-chat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 960px) {
+  .chat-hero, .admin-chat-grid { grid-template-columns: 1fr; }
+  .chat-message-head { flex-direction: column; }
+}
