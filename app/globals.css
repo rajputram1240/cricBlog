@@ -437,107 +437,107 @@ th, td { padding: 0.9rem 0.75rem; text-align: left; border-bottom: 1px solid var
   .chat-send-button { width: 100%; }
 }
 
-.home-hero-shell::after {
+.simple-home-hero::before {
   content: '';
   position: absolute;
-  inset: auto -10% -80px auto;
-  width: 380px;
-  height: 380px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.18), rgba(245, 158, 11, 0));
-  filter: blur(6px);
+  inset: 0;
+  background:
+    radial-gradient(circle at top left, rgba(220, 38, 38, 0.12), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(245, 158, 11, 0.12), transparent 24%);
   pointer-events: none;
 }
-.home-hero-grid {
+.simple-home-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.95fr);
+  gap: 1.5rem;
+  align-items: center;
   position: relative;
 }
-.hero-side-stack {
+.simple-home-copy {
   display: grid;
-  gap: 1rem;
+  gap: 1.2rem;
 }
-.hero-glow-card {
-  box-shadow: 0 28px 64px rgba(127, 29, 29, 0.16);
+.simple-home-copy h1 {
+  margin: 0;
+  font-size: clamp(2.6rem, 5vw, 4.2rem);
+  line-height: 1.05;
 }
-.hero-stats-strip {
+.simple-home-copy p {
+  max-width: 700px;
+}
+.simple-stat-row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
 }
-.mini-stat {
-  background: linear-gradient(180deg, rgba(255, 250, 242, 0.98), rgba(255, 240, 225, 0.95));
-}
-.mini-stat strong {
-  font-size: 2rem;
-  line-height: 1;
-}
-.home-overview-grid {
+.simple-stat-card {
   display: grid;
-  gap: 1.25rem;
-}
-.overview-panel,
-.quick-links-panel,
-.content-spotlight-section,
-.info-band-section {
-  position: relative;
-}
-.compact-section-heading {
-  margin-bottom: 0;
-}
-.home-feature-card {
-  position: relative;
-  padding: 1.25rem;
-  border-radius: 22px;
-  background: rgba(255, 250, 242, 0.72);
+  gap: 0.35rem;
+  padding: 1rem 1.1rem;
+  border-radius: 20px;
+  background: rgba(255, 250, 242, 0.9);
   border: 1px solid rgba(220, 38, 38, 0.12);
 }
-.feature-index {
-  display: inline-flex;
-  margin-bottom: 1rem;
+.simple-stat-card span {
+  color: var(--muted);
   font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: 0.16em;
-  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
 }
-.home-fan-zone-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.simple-stat-card strong {
+  font-size: 1.05rem;
 }
-.fan-zone-card {
+.simple-home-panel {
+  background: linear-gradient(180deg, rgba(255, 250, 242, 0.98), rgba(255, 244, 232, 0.95));
+  border: 1px solid rgba(220, 38, 38, 0.14);
+  box-shadow: 0 24px 60px rgba(127, 29, 29, 0.12);
+}
+.simple-home-panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+.simple-home-panel h2,
+.simple-engagement-card h3,
+.simple-link-card h3 {
+  margin: 0;
+}
+.simple-engagement-grid,
+.simple-link-grid {
   display: grid;
-  gap: 0.75rem;
-  padding: 1.25rem;
-  border-radius: 24px;
-  border: 1px solid rgba(220, 38, 38, 0.12);
-  background: linear-gradient(180deg, rgba(255, 250, 242, 0.98), rgba(255, 244, 232, 0.96));
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-}
-.fan-zone-card:hover,
-.home-info-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 22px 48px rgba(127, 29, 29, 0.12);
-  border-color: rgba(220, 38, 38, 0.24);
-}
-.football-zone {
-  background: linear-gradient(135deg, rgba(255, 245, 238, 0.98), rgba(254, 226, 226, 0.92));
-}
-.cricket-zone {
-  background: linear-gradient(135deg, rgba(255, 248, 240, 0.98), rgba(255, 237, 213, 0.96));
-}
-.home-info-grid {
+  gap: 1rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
-.home-info-card {
+.simple-engagement-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.1rem;
+  border-radius: 20px;
+  background: rgba(255, 248, 240, 0.88);
+  border: 1px solid rgba(220, 38, 38, 0.1);
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
-.home-info-card h3,
-.fan-zone-card h3,
-.home-feature-card h3 {
-  margin: 0;
-  font-size: 1.2rem;
+.simple-engagement-card:hover,
+.simple-link-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 40px rgba(127, 29, 29, 0.1);
+  border-color: rgba(220, 38, 38, 0.2);
+}
+.simple-strip-section {
+  padding-top: 0.5rem;
+}
+.simple-link-card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
 @media (max-width: 960px) {
-  .hero-stats-strip,
-  .home-fan-zone-grid,
-  .home-info-grid {
+  .simple-home-grid,
+  .simple-stat-row,
+  .simple-engagement-grid,
+  .simple-link-grid {
     grid-template-columns: 1fr;
+  }
+  .simple-home-panel-head {
+    flex-direction: column;
   }
 }
