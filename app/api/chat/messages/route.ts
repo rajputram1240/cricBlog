@@ -1,8 +1,19 @@
 import { NextResponse } from 'next/server';
 import { getChatUserSession } from '@/lib/auth';
 import { getChatRoomData } from '@/lib/chat';
+import { publishChatUpdate } from '@/lib/chat-events';
 import { prisma } from '@/lib/prisma';
 import { chatMessageSchema } from '@/lib/validators';
+
+export async function GET() {
+  try {
+    const user = await getChatUserSession();
+    const data = await getChatRoomData(user?.id);
+    return NextResponse.json(data);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || 'Unable to load chat messages' }, { status: 400 });
+  }
+}
 
 export async function POST(request: Request) {
   try {
@@ -12,6 +23,7 @@ export async function POST(request: Request) {
 
     const body = chatMessageSchema.parse(await request.json());
     await prisma.chatMessage.create({ data: { userId: user.id, text: body.text } });
+    publishChatUpdate();
     const data = await getChatRoomData(user.id);
     return NextResponse.json(data);
   } catch (error: any) {
