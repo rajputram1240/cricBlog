@@ -565,3 +565,208 @@ th, td { padding: 0.9rem 0.75rem; text-align: left; border-bottom: 1px solid var
     flex-direction: column;
   }
 }
+
+.homepage-main {
+  display: grid;
+  gap: 0;
+}
+
+.homepage-hero {
+  padding-bottom: 1rem;
+}
+
+.homepage-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.9fr);
+  gap: 1.5rem;
+  align-items: stretch;
+  padding-top: 3.5rem;
+}
+
+.homepage-hero-copy {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.homepage-hero-copy h1 {
+  font-size: clamp(2.8rem, 5vw, 5.25rem);
+  line-height: 0.96;
+  margin: 0;
+  max-width: 12ch;
+}
+
+.homepage-hero-copy p {
+  max-width: 62ch;
+  font-size: 1.05rem;
+}
+
+.homepage-hero-highlights {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.homepage-signal-card {
+  padding: 1.1rem;
+  border-radius: 24px;
+  background: rgba(255, 250, 242, 0.8);
+  border: 1px solid rgba(220, 38, 38, 0.1);
+  box-shadow: 0 14px 34px rgba(127, 29, 29, 0.06);
+}
+
+.homepage-signal-card strong {
+  display: block;
+  font-size: 1.8rem;
+  margin-bottom: 0.4rem;
+}
+
+.homepage-signal-card span {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.45rem;
+}
+
+.homepage-signal-card p,
+.homepage-promise-item p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.homepage-hero-panel {
+  background: linear-gradient(180deg, rgba(255, 249, 240, 0.96), rgba(255, 241, 229, 0.98));
+}
+
+.homepage-panel-body {
+  gap: 1.25rem;
+}
+
+.homepage-panel-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1rem;
+}
+
+.homepage-panel-top h2 {
+  margin: 0.4rem 0 0;
+  font-size: clamp(1.7rem, 2.2vw, 2.5rem);
+  line-height: 1.05;
+}
+
+.homepage-spotlight {
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(127, 29, 29, 0.96), rgba(185, 28, 28, 0.9));
+  color: #fff7ed;
+  border: none;
+}
+
+.homepage-spotlight .muted-text,
+.homepage-spotlight-meta {
+  color: rgba(255, 247, 237, 0.82);
+}
+
+.homepage-spotlight-body {
+  gap: 0.85rem;
+}
+
+.homepage-spotlight-body h3 {
+  margin: 0;
+  font-size: 1.55rem;
+  line-height: 1.2;
+}
+
+.homepage-spotlight-label {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255, 247, 237, 0.75);
+}
+
+.homepage-spotlight-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.88rem;
+}
+
+.homepage-promise-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.homepage-promise-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.homepage-promise-dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-top: 0.35rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), #f97316);
+  box-shadow: 0 0 0 6px rgba(220, 38, 38, 0.08);
+}
+
+.homepage-pillar-grid,
+.homepage-destination-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.homepage-pillar-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.homepage-destination-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.homepage-pillar-card,
+.homepage-destination-card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.homepage-pillar-card:hover,
+.homepage-destination-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(220, 38, 38, 0.24);
+  box-shadow: 0 20px 48px rgba(127, 29, 29, 0.12);
+}
+
+.homepage-fan-zone-section {
+  position: relative;
+}
+
+.homepage-fan-zone-section::before {
+  content: '';
+  position: absolute;
+  inset: 1rem 0 0;
+  z-index: -1;
+  border-radius: 32px;
+  background: linear-gradient(180deg, rgba(255, 247, 237, 0.7), rgba(255, 250, 242, 0));
+}
+
+@media (max-width: 960px) {
+  .homepage-hero-grid,
+  .homepage-hero-highlights,
+  .homepage-pillar-grid,
+  .homepage-destination-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .homepage-panel-top,
+  .homepage-spotlight-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .homepage-hero-copy h1 {
+    max-width: none;
+  }
+}
