@@ -1,6 +1,7 @@
 import { BlogStatus, TicketStatus } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { slugify } from '@/lib/utils';
+import { serializeTicketForViewer } from '@/lib/tickets';
 import { blogInputSchema } from '@/lib/validators';
 
 const siteContentDefaults: Record<string, { title: string; description: string; body: string }> = {
@@ -85,7 +86,7 @@ export async function getTicketMarketplace(fanId?: string) {
       })
     : null;
 
-  return { tickets, activeSale, dailyTicket };
+  return { tickets: tickets.map((ticket) => serializeTicketForViewer(ticket, fanId)), activeSale, dailyTicket };
 }
 
 export async function getPostBySlug(slug: string) {

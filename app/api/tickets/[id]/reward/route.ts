@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getFanSession } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { serializeTicketForViewer } from '@/lib/tickets';
 import { rewardBidSchema } from '@/lib/validators';
 
 export async function POST(request: Request, context: { params: Promise<{ id: string }> }) {
@@ -20,7 +21,7 @@ export async function POST(request: Request, context: { params: Promise<{ id: st
       where: { id },
       include: { seller: true, bids: { include: { bidder: true }, orderBy: [{ amount: 'desc' }, { createdAt: 'asc' }] }, soldBid: { include: { bidder: true } } },
     });
-    return NextResponse.json({ ticket: refreshed });
+    return NextResponse.json({ ticket: serializeTicketForViewer(refreshed, fan.id) });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Unable to reward bidder' }, { status: 400 });
   }
