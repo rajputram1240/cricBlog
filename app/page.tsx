@@ -3,7 +3,7 @@ import { BlogCard } from '@/components/BlogCard';
 import { SearchFilters } from '@/components/SearchFilters';
 import { getPublishedPosts } from '@/lib/data';
 
-const engagementCards = [
+const highlights = [
   {
     title: 'Fast discovery',
     text: 'Readers can jump from the hero to the biggest stories in one scroll.',
@@ -15,6 +15,54 @@ const engagementCards = [
   {
     title: 'Cleaner reading flow',
     text: 'The homepage stays simple while still encouraging deeper browsing.',
+  },
+];
+
+const infoSections = [
+  {
+    id: 1,
+    kicker: 'About',
+    title: 'About SportsDraft',
+    body: 'Learn what we cover and how we bring sports stories to fans.',
+    href: '/about',
+  },
+  {
+    id: 2,
+    kicker: 'Partner',
+    title: 'Partner With Us',
+    body: 'Collaborate with us for campaigns and promotions.',
+    href: '/partner-with-us',
+  },
+  {
+    id: 3,
+    kicker: 'Community',
+    title: 'Fan Features',
+    body: 'Explore chat, tickets, and engagement tools.',
+    href: '/fan-chat',
+  },
+];
+
+const fanZones = [
+  {
+    label: 'Community',
+    title: 'Fan Chat',
+    body: 'Discuss matches, share opinions, and connect with fans.',
+    href: '/fan-chat',
+    accent: 'accent-blue',
+  },
+  {
+    label: 'Tickets',
+    title: 'Buy Tickets',
+    body: 'Find and bid on cricket match tickets easily.',
+    href: '/tickets',
+    accent: 'accent-green',
+  },
+  {
+    label: 'Explore',
+    title: 'Football Hub',
+    body: 'All football stories, transfers, and match previews.',
+    href: '/category/football',
+    accent: 'accent-purple',
   },
 ];
 
@@ -89,64 +137,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
                   <span>{item.label}</span>
                   <strong>{item.value}</strong>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="simple-home-panel card">
-            <div className="card-body">
-              <div className="simple-home-panel-head">
-                <div>
-                  <span className="kicker">Start here</span>
-                  <h2>Everything important is one tap away.</h2>
-                </div>
-                <span className="scoreboard-tag">{posts.length} stories</span>
-              </div>
-
-              <div className="simple-engagement-grid">
-                {engagementCards.map((card) => (
-                  <Link key={card.title} href={card.href} className="simple-engagement-card">
-                    <h3>{card.title}</h3>
-                    <p className="muted-text">{card.text}</p>
-                    <span className="text-link">{card.cta} →</span>
-                  </Link>
-                ))}
-              </div>
-
-              <div className="simple-engagement-grid">
-                {engagementCards.map((card) => (
-                  <Link key={card.title} href={card.href} className="simple-engagement-card">
-                    <h3>{card.title}</h3>
-                    <p className="muted-text">{card.text}</p>
-                    <span className="text-link">{card.cta} →</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-            <div className="highlights-grid">
-              {highlights.map((item, index) => (
-                <article key={item.title} className="feature-card home-feature-card">
-                  <span className="feature-index">0{index + 1}</span>
-                  <h3>{item.title}</h3>
-                  <p className="muted-text">{item.text}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="card sports-panel quick-links-panel">
-          <div className="card-body">
-            <span className="kicker">Quick fan routes</span>
-            <h2 className="feature-title">Jump from the homepage to the experience you want.</h2>
-            <div className="fan-zone-grid home-fan-zone-grid">
-              {fanZones.map((zone) => (
-                <Link key={zone.title} href={zone.href} className={`fan-zone-card ${zone.accent}`}>
-                  <span className="kicker">{zone.label}</span>
-                  <h3>{zone.title}</h3>
-                  <p className="muted-text">{zone.body}</p>
-                  <span className="text-link">Open section →</span>
-                </Link>
               ))}
             </div>
           </div>
