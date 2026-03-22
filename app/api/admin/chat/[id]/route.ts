@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { ChatReportStatus } from '@prisma/client';
 import { requireAdmin } from '@/lib/auth';
-import { publishChatUpdate } from '@/lib/chat-events';
+import { publishChatUpdate } from '@/lib/chat-socket';
 import { prisma } from '@/lib/prisma';
 import { adminChatActionSchema } from '@/lib/validators';
 

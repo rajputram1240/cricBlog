@@ -3,6 +3,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+function getChatSocketUrl() {
+  if (typeof window === 'undefined') return '';
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  return `${protocol}//${window.location.host}/api/chat/socket`;
+}
+
 export function FanChatRoom({ initialMessages, user, openReports }: { initialMessages: any[]; user: any; openReports: number }) {
   const router = useRouter();
   const [messages, setMessages] = useState(initialMessages);
@@ -21,7 +27,9 @@ export function FanChatRoom({ initialMessages, user, openReports }: { initialMes
   }, [openReports]);
 
   useEffect(() => {
-    const eventSource = new EventSource('/api/chat/stream');
+    let socket: WebSocket | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    let cancelled = false;
 
     async function refreshMessages() {
       const response = await fetch('/api/chat/messages', { cache: 'no-store' });
@@ -31,12 +39,25 @@ export function FanChatRoom({ initialMessages, user, openReports }: { initialMes
       setReportCount(data.openReports);
     }
 
-    eventSource.onmessage = () => {
-      void refreshMessages();
-    };
+    function connect() {
+      socket = new WebSocket(getChatSocketUrl());
+
+      socket.addEventListener('message', () => {
+        void refreshMessages();
+      });
+
+      socket.addEventListener('close', () => {
+        if (cancelled) return;
+        reconnectTimer = setTimeout(connect, 1500);
+      });
+    }
+
+    connect();
 
     return () => {
-      eventSource.close();
+      cancelled = true;
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      socket?.close();
     };
   }, []);
 

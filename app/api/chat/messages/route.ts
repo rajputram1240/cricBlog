@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getChatUserSession } from '@/lib/auth';
 import { getChatRoomData } from '@/lib/chat';
-import { publishChatUpdate } from '@/lib/chat-events';
+import { publishChatUpdate } from '@/lib/chat-socket';
 import { prisma } from '@/lib/prisma';
 import { chatMessageSchema } from '@/lib/validators';
 
