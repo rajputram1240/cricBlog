@@ -1,4 +1,4 @@
-import { BlogStatus, TicketStatus } from '@prisma/client';
+import { BlogStatus, PredictionPurchaseStatus, TicketStatus } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { slugify } from '@/lib/utils';
 import { serializeTicketForViewer } from '@/lib/tickets';
@@ -88,6 +88,68 @@ export async function getTicketMarketplace(fanId?: string) {
     : null;
 
   return { tickets: tickets.map((ticket) => serializeTicketForViewer(ticket, fanId)), activeSale, dailyTicket };
+}
+
+export async function getPredictionHubData(fanId?: string, masterId?: string) {
+  const [posts, myPurchases, masterPurchases] = await Promise.all([
+    prisma.predictionPost.findMany({
+      include: {
+        master: true,
+        purchases: fanId ? { where: { buyerId: fanId } } : false,
+      },
+      orderBy: { createdAt: 'desc' },
+    }),
+    fanId
+      ? prisma.predictionPurchase.findMany({
+          where: { buyerId: fanId },
+          include: { post: { include: { master: true } } },
+          orderBy: { createdAt: 'desc' },
+        })
+      : Promise.resolve([]),
+    masterId
+      ? prisma.predictionPurchase.findMany({
+          where: { masterId },
+          include: { buyer: true, post: true },
+          orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],
+        })
+      : Promise.resolve([]),
+  ]);
+
+  return {
+    posts: posts.map((post) => {
+      const myPurchase = Array.isArray(post.purchases) ? post.purchases[0] ?? null : null;
+      return {
+        id: post.id,
+        matchTitle: post.matchTitle,
+        title: post.title,
+        content: post.content,
+        fee: post.fee,
+        chanceToWin: post.chanceToWin,
+        createdAt: post.createdAt,
+        master: {
+          id: post.master.id,
+          name: post.master.name,
+          upiId: post.master.upiId,
+        },
+        reveal: myPurchase?.status === PredictionPurchaseStatus.approved ? {
+          slipId: post.slipId,
+          platform: post.platform,
+        } : null,
+        myPurchase: myPurchase ? {
+          id: myPurchase.id,
+          status: myPurchase.status,
+          buyerPhone: myPurchase.buyerPhone,
+          buyerEmail: myPurchase.buyerEmail,
+          utr: myPurchase.utr,
+          requestedAt: myPurchase.requestedAt,
+          approvedAt: myPurchase.approvedAt,
+          masterNote: myPurchase.masterNote,
+        } : null,
+      };
+    }),
+    myPurchases,
+    masterPurchases,
+  };
 }
 
 export async function getPostBySlug(slug: string) {

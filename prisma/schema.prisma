@@ -26,6 +26,12 @@ enum ChatReportStatus {
   dismissed
 }
 
+enum PredictionPurchaseStatus {
+  pending
+  approved
+  rejected
+}
+
 model Admin {
   id            String     @id @default(auto()) @map("_id") @db.ObjectId
   name          String
@@ -79,15 +85,16 @@ model SiteContent {
 }
 
 model FanUser {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  email       String       @unique
-  phone       String?
-  tickets     MatchTicket[]
-  bids        TicketBid[]  @relation("BidderBids")
-  rewards     TicketBid[]  @relation("RewardedBids")
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id                  String               @id @default(auto()) @map("_id") @db.ObjectId
+  name                String
+  email               String               @unique
+  phone               String?
+  tickets             MatchTicket[]
+  bids                TicketBid[]          @relation("BidderBids")
+  rewards             TicketBid[]          @relation("RewardedBids")
+  predictionPurchases PredictionPurchase[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
 }
 
 model MatchTicket {
@@ -128,50 +135,100 @@ model TicketBid {
 }
 
 model ChatUser {
-  id           String        @id @default(auto()) @map("_id") @db.ObjectId
-  name         String
-  phone        String        @unique
-  isBlocked    Boolean       @default(false)
-  blockReason  String?
-  messages     ChatMessage[]
-  reportsMade  ChatReport[]  @relation("ReporterReports")
-  reportsOnMe  ChatReport[]  @relation("ReportedUserReports")
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  phone       String        @unique
+  isBlocked   Boolean       @default(false)
+  blockReason String?
+  messages    ChatMessage[]
+  reportsMade ChatReport[]  @relation("ReporterReports")
+  reportsOnMe ChatReport[]  @relation("ReportedUserReports")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 model ChatMessage {
-  id          String       @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String       @db.ObjectId
-  user        ChatUser     @relation(fields: [userId], references: [id])
-  text        String
-  isDeleted   Boolean      @default(false)
-  reports     ChatReport[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id        String       @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String       @db.ObjectId
+  user      ChatUser     @relation(fields: [userId], references: [id])
+  text      String
+  isDeleted Boolean      @default(false)
+  reports   ChatReport[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
 }
 
 model ChatReport {
-  id              String           @id @default(auto()) @map("_id") @db.ObjectId
-  messageId       String           @db.ObjectId
-  message         ChatMessage      @relation(fields: [messageId], references: [id])
-  reporterId      String           @db.ObjectId
-  reporter        ChatUser         @relation("ReporterReports", fields: [reporterId], references: [id])
-  reportedUserId  String           @db.ObjectId
-  reportedUser    ChatUser         @relation("ReportedUserReports", fields: [reportedUserId], references: [id])
-  reason          String
-  status          ChatReportStatus @default(open)
-  adminNote       String?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id             String           @id @default(auto()) @map("_id") @db.ObjectId
+  messageId      String           @db.ObjectId
+  message        ChatMessage      @relation(fields: [messageId], references: [id])
+  reporterId     String           @db.ObjectId
+  reporter       ChatUser         @relation("ReporterReports", fields: [reporterId], references: [id])
+  reportedUserId String           @db.ObjectId
+  reportedUser   ChatUser         @relation("ReportedUserReports", fields: [reportedUserId], references: [id])
+  reason         String
+  status         ChatReportStatus @default(open)
+  adminNote      String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
   @@unique([messageId, reporterId])
 }
 
 model ChatCleanupState {
-  id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  key           String   @unique
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  key           String    @unique
   lastCleanupAt DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model PredictionMaster {
+  id                String               @id @default(auto()) @map("_id") @db.ObjectId
+  name              String
+  email             String               @unique
+  phone             String
+  upiId             String
+  posts             PredictionPost[]
+  purchaseApprovals PredictionPurchase[] @relation("ApproverPurchases")
+  createdAt         DateTime             @default(now())
+  updatedAt         DateTime             @updatedAt
+}
+
+model PredictionPost {
+  id          String               @id @default(auto()) @map("_id") @db.ObjectId
+  masterId    String               @db.ObjectId
+  master      PredictionMaster     @relation(fields: [masterId], references: [id])
+  matchTitle  String
+  title       String
+  content     String
+  slipId      String
+  fee         Float
+  platform    String
+  chanceToWin Int
+  purchases   PredictionPurchase[]
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+}
+
+model PredictionPurchase {
+  id          String                   @id @default(auto()) @map("_id") @db.ObjectId
+  postId      String                   @db.ObjectId
+  post        PredictionPost           @relation(fields: [postId], references: [id])
+  buyerId     String                   @db.ObjectId
+  buyer       FanUser                  @relation(fields: [buyerId], references: [id])
+  masterId    String                   @db.ObjectId
+  master      PredictionMaster         @relation("ApproverPurchases", fields: [masterId], references: [id])
+  utr         String
+  buyerPhone  String
+  buyerEmail  String
+  status      PredictionPurchaseStatus @default(pending)
+  masterNote  String?
+  requestedAt DateTime                 @default(now())
+  approvedAt  DateTime?
+  createdAt   DateTime                 @default(now())
+  updatedAt   DateTime                 @updatedAt
+
+  @@unique([postId, buyerId])
+  @@index([masterId, status])
 }

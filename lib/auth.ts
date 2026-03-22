@@ -7,6 +7,7 @@ import { prisma } from '@/lib/prisma';
 const ADMIN_COOKIE_NAME = 'sports_admin_session';
 const FAN_COOKIE_NAME = 'sports_fan_session';
 const CHAT_COOKIE_NAME = 'sports_chat_session';
+const PREDICTION_MASTER_COOKIE_NAME = 'sports_prediction_master_session';
 
 function sign(value: string) {
   const secret = process.env.SESSION_SECRET || 'change-this-secret';
@@ -79,6 +80,31 @@ export async function getFanSession() {
   return prisma.fanUser.findUnique({ where: { id: fanId } });
 }
 
+
+
+export async function loginPredictionMaster(name: string, email: string, phone: string, upiId: string) {
+  const master = await prisma.predictionMaster.upsert({
+    where: { email: email.toLowerCase() },
+    update: { name, phone: phone.trim(), upiId: upiId.trim().toLowerCase() },
+    create: { name, email: email.toLowerCase(), phone: phone.trim(), upiId: upiId.trim().toLowerCase() },
+  });
+
+  const store = await cookies();
+  store.set(PREDICTION_MASTER_COOKIE_NAME, makeToken(master.id), { httpOnly: true, sameSite: 'lax', secure: false, path: '/' });
+  return master;
+}
+
+export async function logoutPredictionMaster() {
+  const store = await cookies();
+  store.delete(PREDICTION_MASTER_COOKIE_NAME);
+}
+
+export async function getPredictionMasterSession() {
+  const store = await cookies();
+  const masterId = readSignedId(store.get(PREDICTION_MASTER_COOKIE_NAME)?.value);
+  if (!masterId) return null;
+  return prisma.predictionMaster.findUnique({ where: { id: masterId } });
+}
 
 export async function loginChatUser(name: string, phone: string) {
   const normalizedPhone = phone.trim();

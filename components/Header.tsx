@@ -9,6 +9,7 @@ export function Header() {
           <Link href="/category/football">Football</Link>
           <Link href="/category/cricket">Cricket</Link>
           <Link href="/tickets">Ticket auction</Link>
+          <Link href="/predictions">Predictions</Link>
           <Link href="/fan-chat">Fan chat</Link>
         </nav>
       </div>
