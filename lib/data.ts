@@ -1,4 +1,4 @@
-import { BlogStatus } from '@prisma/client';
+import { BlogStatus, TicketStatus } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { slugify } from '@/lib/utils';
 import { blogInputSchema } from '@/lib/validators';
@@ -50,6 +50,42 @@ export async function getPublishedPosts(params?: { category?: string; query?: st
     include: { category: true },
     orderBy: { publishedAt: 'desc' },
   });
+}
+
+export async function getTicketMarketplace(fanId?: string) {
+  const tickets = await prisma.matchTicket.findMany({
+    include: {
+      seller: true,
+      soldBid: { include: { bidder: true } },
+      bids: { include: { bidder: true }, orderBy: [{ amount: 'desc' }, { createdAt: 'asc' }] },
+    },
+    orderBy: [{ status: 'asc' }, { matchDate: 'asc' }, { createdAt: 'desc' }],
+  });
+
+  const today = new Date();
+  const start = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0, 0));
+  const end = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 23, 59, 59, 999));
+
+  const activeSale = fanId
+    ? await prisma.matchTicket.findFirst({
+        where: {
+          sellerId: fanId,
+          status: TicketStatus.open,
+        },
+      })
+    : null;
+
+  const dailyTicket = fanId
+    ? await prisma.matchTicket.findFirst({
+        where: {
+          sellerId: fanId,
+          createdAt: { gte: start, lte: end },
+        },
+        orderBy: { createdAt: 'desc' },
+      })
+    : null;
+
+  return { tickets, activeSale, dailyTicket };
 }
 
 export async function getPostBySlug(slug: string) {

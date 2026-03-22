@@ -11,6 +11,7 @@ export function Header() {
           <Link href="/about">About us</Link>
           <Link href="/privacy-policy">Privacy policy</Link>
           <Link href="/partner-with-us">Partner with us</Link>
+          <Link href="/tickets">Ticket auction</Link>
           <Link href="/admin">Admin</Link>
         </nav>
       </div>
