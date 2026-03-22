@@ -43,18 +43,21 @@ const usefulLinks = [
 const infoSections = [
   {
     id: 'about',
+    href: '/about',
     kicker: 'About us',
     title: 'A modern sports newsroom for football and cricket fans.',
     body: 'SportsDraft Daily blends AI-assisted drafting with hands-on editorial checks so readers get timely updates without sacrificing quality. Our workflow helps the team move quickly while keeping every story aligned with newsroom standards.',
   },
   {
     id: 'privacy',
+    href: '/privacy-policy',
     kicker: 'Privacy policy',
     title: 'Your search, browsing, and contact details are handled responsibly.',
     body: 'We only collect the minimum information needed to improve the reading experience, manage contact requests, and maintain site security. Sensitive admin actions remain protected behind the newsroom workflow, and public readers never see draft-only content.',
   },
   {
     id: 'partner',
+    href: '/partner-with-us',
     kicker: 'Partner with us',
     title: 'Work with our team on campaigns, co-branded coverage, and content distribution.',
     body: 'If you want to promote a sports product, sponsor a special series, or contribute to our fan community, our editorial and admin team can manage assets, upload content, and review each partnership submission before launch.',
@@ -161,10 +164,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
 
       <section className="shell page-section info-grid">
         {infoSections.map((section) => (
-          <article key={section.id} id={section.id} className="panel info-card sports-panel">
+          <article key={section.id} className="panel info-card sports-panel">
             <span className="kicker">{section.kicker}</span>
             <h2>{section.title}</h2>
             <p className="muted-text">{section.body}</p>
+            <Link href={section.href} className="text-link">Open page →</Link>
           </article>
         ))}
       </section>

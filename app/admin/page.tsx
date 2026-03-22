@@ -8,5 +8,5 @@ export default async function AdminPage() {
   if (!admin) redirect('/admin/login');
   const data = await getAdminDashboardData();
 
-  return <AdminDashboard initialPosts={data.posts} categories={data.categories} stats={data.stats} />;
+  return <AdminDashboard initialPosts={data.posts} categories={data.categories} stats={data.stats} initialSiteContent={data.siteContent} adminName={admin.name} />;
 }
