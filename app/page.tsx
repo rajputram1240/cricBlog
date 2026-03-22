@@ -5,6 +5,21 @@ import { getPublishedPosts } from '@/lib/data';
 
 const engagementCards = [
   {
+    title: 'Fast discovery',
+    text: 'Readers can jump from the hero to the biggest stories in one scroll.',
+  },
+  {
+    title: 'Fan-friendly actions',
+    text: 'Football, cricket, chat, and tickets stay easy to reach from the homepage.',
+  },
+  {
+    title: 'Cleaner reading flow',
+    text: 'The homepage stays simple while still encouraging deeper browsing.',
+  },
+];
+
+const engagementCards = [
+  {
     title: 'Football stories',
     text: 'Go straight to transfer news, match previews, and big-club updates.',
     href: '/category/football',
@@ -97,6 +112,16 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
                   </Link>
                 ))}
               </div>
+
+              <div className="simple-engagement-grid">
+                {engagementCards.map((card) => (
+                  <Link key={card.title} href={card.href} className="simple-engagement-card">
+                    <h3>{card.title}</h3>
+                    <p className="muted-text">{card.text}</p>
+                    <span className="text-link">{card.cta} →</span>
+                  </Link>
+                ))}
+              </div>
             </div>
             <div className="highlights-grid">
               {highlights.map((item, index) => (
@@ -125,6 +150,18 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ q
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="shell page-section simple-highlights-section">
+        <div className="highlights-grid simple-highlights-grid">
+          {highlights.map((item, index) => (
+            <article key={item.title} className="simple-highlight-card">
+              <span className="feature-index">0{index + 1}</span>
+              <h3>{item.title}</h3>
+              <p className="muted-text">{item.text}</p>
+            </article>
+          ))}
         </div>
       </section>
 
