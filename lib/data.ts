@@ -2,7 +2,6 @@ import { BlogStatus, PredictionPurchaseStatus, TicketStatus } from '@prisma/clie
 import { prisma } from '@/lib/prisma';
 import { slugify } from '@/lib/utils';
 import { serializeTicketForViewer } from '@/lib/tickets';
-import { getAdminChatData } from '@/lib/chat';
 import { blogInputSchema } from '@/lib/validators';
 
 const siteContentDefaults: Record<string, { title: string; description: string; body: string }> = {
@@ -197,18 +196,16 @@ export async function saveSiteContent(input: { slug: string; title: string; desc
 }
 
 export async function getAdminDashboardData() {
-  const [categories, posts, siteContent, chat] = await Promise.all([
+  const [categories, posts, siteContent] = await Promise.all([
     prisma.category.findMany({ orderBy: { name: 'asc' } }),
     prisma.blogPost.findMany({ include: { category: true }, orderBy: { updatedAt: 'desc' } }),
     getAllSiteContent(),
-    getAdminChatData(),
   ]);
 
   return {
     categories,
     posts,
     siteContent,
-    chat,
     stats: {
       total: posts.length,
       football: posts.filter((post) => post.category.slug === 'football').length,

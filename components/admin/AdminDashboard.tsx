@@ -4,17 +4,14 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Badge } from '@/components/Badge';
 
-export function AdminDashboard({ initialPosts, categories, stats, initialSiteContent, adminName, initialChat }: { initialPosts: any[]; categories: any[]; stats: Record<string, number>; initialSiteContent: any[]; adminName: string; initialChat: { users: any[]; messages: any[]; reports: any[] } }) {
+export function AdminDashboard({ initialPosts, categories, stats, initialSiteContent, adminName }: { initialPosts: any[]; categories: any[]; stats: Record<string, number>; initialSiteContent: any[]; adminName: string }) {
   const router = useRouter();
   const [posts, setPosts] = useState(initialPosts);
   const [filters, setFilters] = useState({ q: '', status: '', category: '', date: '' });
   const [generate, setGenerate] = useState({ category: 'football', topic: 'Premier League title race update' });
   const [siteContent, setSiteContent] = useState(initialSiteContent);
-  const [chat, setChat] = useState(initialChat);
   const [busy, setBusy] = useState(false);
   const [savingSlug, setSavingSlug] = useState('');
-  const [chatBusy, setChatBusy] = useState('');
-  const [adminReason, setAdminReason] = useState<Record<string, string>>({});
 
   const filteredPosts = useMemo(() => posts.filter((post) => {
     const matchText = !filters.q || [post.title, post.summary, post.tags].join(' ').toLowerCase().includes(filters.q.toLowerCase());
@@ -24,10 +21,6 @@ export function AdminDashboard({ initialPosts, categories, stats, initialSiteCon
     const matchDate = !filters.date || new Date(dateValue).toISOString().slice(0, 10) === filters.date;
     return matchText && matchStatus && matchCategory && matchDate;
   }), [filters, posts]);
-
-  async function refreshChat() {
-    router.refresh();
-  }
 
   async function generateBlog() {
     setBusy(true);
@@ -67,29 +60,6 @@ export function AdminDashboard({ initialPosts, categories, stats, initialSiteCon
     router.refresh();
   }
 
-  async function runChatAction(id: string, action: 'delete_message' | 'block_user' | 'dismiss_report') {
-    setChatBusy(`${action}-${id}`);
-    const response = await fetch(`/api/admin/chat/${id}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, reason: adminReason[id] || '' }),
-    });
-    const data = await response.json().catch(() => ({}));
-    setChatBusy('');
-    if (!response.ok) return alert(data.error || 'Chat action failed');
-    setChat((current) => ({
-      ...current,
-      messages: current.messages.filter((message) => action === 'delete_message' ? message.id !== id : true),
-      users: current.users.map((user) => action === 'block_user' && user.id === id ? { ...user, isBlocked: true, blockReason: adminReason[id] || 'Blocked by admin' } : user),
-      reports: current.reports.filter((report) => action === 'dismiss_report' ? report.id !== id : true).map((report) => {
-        if (action === 'delete_message' && report.messageId === id) return { ...report, status: 'actioned' };
-        if (action === 'block_user' && report.reportedUserId === id) return { ...report, status: 'actioned' };
-        return report;
-      }),
-    }));
-    await refreshChat();
-  }
-
   return (
     <div className="page-section shell">
       <section className="hero admin-hero">
@@ -102,7 +72,7 @@ export function AdminDashboard({ initialPosts, categories, stats, initialSiteCon
           <div className="panel admin-welcome">
             <span className="kicker">Signed in</span>
             <strong>{adminName}</strong>
-            <span className="muted-text">Manage blogs, public pages, and fan chat moderation.</span>
+            <span className="muted-text">Manage blogs and public pages.</span>
           </div>
           <button className="button button-secondary" onClick={logout}>Logout</button>
         </div>
@@ -144,77 +114,6 @@ export function AdminDashboard({ initialPosts, categories, stats, initialSiteCon
             {categories.map((category) => <option key={category.id} value={category.slug}>{category.name}</option>)}
           </select>
           <input className="input" type="date" value={filters.date} onChange={(e) => setFilters((current) => ({ ...current, date: e.target.value }))} />
-        </div>
-      </section>
-
-      <section className="panel page-section form-stack">
-        <div className="section-heading compact-heading">
-          <div>
-            <span className="kicker">Fan chat moderation</span>
-            <h2>Review reported messages, hidden phone numbers, and block abusive users.</h2>
-          </div>
-          <p className="muted-text section-copy">Phone numbers stay hidden from fans but are visible here for admin safety review.</p>
-        </div>
-        <div className="content-admin-grid admin-chat-grid">
-          <article className="panel form-stack content-editor-card">
-            <span className="kicker">Recent chat messages</span>
-            {chat.messages.map((message) => (
-              <div key={message.id} className="subtle-panel panel form-stack">
-                <div>
-                  <strong>{message.user.name}</strong>
-                  <div className="muted-text">{message.user.phone} • {new Date(message.createdAt).toLocaleString()}</div>
-                </div>
-                <div>{message.text}</div>
-                <div className="inline-actions">
-                  <input className="input" placeholder="Admin note or reason" value={adminReason[message.id] || ''} onChange={(e) => setAdminReason((current) => ({ ...current, [message.id]: e.target.value }))} />
-                  <button className="button button-danger" onClick={() => runChatAction(message.id, 'delete_message')} disabled={chatBusy === `delete_message-${message.id}`}>{chatBusy === `delete_message-${message.id}` ? 'Deleting…' : 'Delete message'}</button>
-                </div>
-              </div>
-            ))}
-            {chat.messages.length === 0 ? <div className="empty-state">No chat messages available after the latest daily reset.</div> : null}
-          </article>
-
-          <article className="panel form-stack content-editor-card">
-            <span className="kicker">Reported users</span>
-            {chat.users.map((user) => (
-              <div key={user.id} className="subtle-panel panel form-stack">
-                <div className="inline-actions">
-                  <strong>{user.name}</strong>
-                  {user.isBlocked ? <span className="badge badge-rejected">Blocked</span> : null}
-                </div>
-                <div className="muted-text">Phone: {user.phone}</div>
-                <div className="muted-text">Messages: {user._count.messages} • Reports against user: {user._count.reportsOnMe}</div>
-                {!user.isBlocked ? (
-                  <>
-                    <input className="input" placeholder="Reason for block" value={adminReason[user.id] || ''} onChange={(e) => setAdminReason((current) => ({ ...current, [user.id]: e.target.value }))} />
-                    <button className="button button-danger" onClick={() => runChatAction(user.id, 'block_user')} disabled={chatBusy === `block_user-${user.id}`}>{chatBusy === `block_user-${user.id}` ? 'Blocking…' : 'Block user'}</button>
-                  </>
-                ) : <div className="notice-banner">{user.blockReason || 'Blocked by admin'}</div>}
-              </div>
-            ))}
-          </article>
-
-          <article className="panel form-stack content-editor-card">
-            <span className="kicker">Open and recent reports</span>
-            {chat.reports.map((report) => (
-              <div key={report.id} className="subtle-panel panel form-stack">
-                <div className="inline-actions">
-                  <strong>{report.reporter.name} reported {report.reportedUser.name}</strong>
-                  <span className={`badge ${report.status === 'open' ? 'badge-pending' : 'badge-approved'}`}>{report.status}</span>
-                </div>
-                <div className="muted-text">Reported user phone: {report.reportedUser.phone}</div>
-                <div className="muted-text">Reason: {report.reason}</div>
-                <div className="muted-text">Message: {report.message?.text || 'Message removed'}</div>
-                {report.status === 'open' ? (
-                  <>
-                    <input className="input" placeholder="Dismiss note" value={adminReason[report.id] || ''} onChange={(e) => setAdminReason((current) => ({ ...current, [report.id]: e.target.value }))} />
-                    <button className="button button-secondary" onClick={() => runChatAction(report.id, 'dismiss_report')} disabled={chatBusy === `dismiss_report-${report.id}`}>{chatBusy === `dismiss_report-${report.id}` ? 'Dismissing…' : 'Dismiss report'}</button>
-                  </>
-                ) : <div className="muted-text">{report.adminNote || 'Admin reviewed this report.'}</div>}
-              </div>
-            ))}
-            {chat.reports.length === 0 ? <div className="empty-state">No reports have been submitted yet.</div> : null}
-          </article>
         </div>
       </section>
 
