@@ -20,12 +20,6 @@ enum TicketStatus {
   sold
 }
 
-enum ChatReportStatus {
-  open
-  actioned
-  dismissed
-}
-
 enum PredictionPurchaseStatus {
   pending
   approved
@@ -132,55 +126,6 @@ model TicketBid {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   soldTicket   MatchTicket[] @relation("SoldBid")
-}
-
-model ChatUser {
-  id          String        @id @default(auto()) @map("_id") @db.ObjectId
-  name        String
-  phone       String        @unique
-  isBlocked   Boolean       @default(false)
-  blockReason String?
-  messages    ChatMessage[]
-  reportsMade ChatReport[]  @relation("ReporterReports")
-  reportsOnMe ChatReport[]  @relation("ReportedUserReports")
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-}
-
-model ChatMessage {
-  id        String       @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String       @db.ObjectId
-  user      ChatUser     @relation(fields: [userId], references: [id])
-  text      String
-  isDeleted Boolean      @default(false)
-  reports   ChatReport[]
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
-}
-
-model ChatReport {
-  id             String           @id @default(auto()) @map("_id") @db.ObjectId
-  messageId      String           @db.ObjectId
-  message        ChatMessage      @relation(fields: [messageId], references: [id])
-  reporterId     String           @db.ObjectId
-  reporter       ChatUser         @relation("ReporterReports", fields: [reporterId], references: [id])
-  reportedUserId String           @db.ObjectId
-  reportedUser   ChatUser         @relation("ReportedUserReports", fields: [reportedUserId], references: [id])
-  reason         String
-  status         ChatReportStatus @default(open)
-  adminNote      String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-
-  @@unique([messageId, reporterId])
-}
-
-model ChatCleanupState {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  key           String    @unique
-  lastCleanupAt DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
 }
 
 model PredictionMaster {

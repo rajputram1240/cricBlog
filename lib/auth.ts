@@ -6,7 +6,6 @@ import { prisma } from '@/lib/prisma';
 
 const ADMIN_COOKIE_NAME = 'sports_admin_session';
 const FAN_COOKIE_NAME = 'sports_fan_session';
-const CHAT_COOKIE_NAME = 'sports_chat_session';
 const PREDICTION_MASTER_COOKIE_NAME = 'sports_prediction_master_session';
 
 function sign(value: string) {
@@ -106,36 +105,4 @@ export async function getPredictionMasterSession() {
   return prisma.predictionMaster.findUnique({ where: { id: masterId } });
 }
 
-export async function loginChatUser(name: string, phone: string) {
-  const normalizedPhone = phone.trim();
-  const user = await prisma.chatUser.upsert({
-    where: { phone: normalizedPhone },
-    update: { name },
-    create: { name, phone: normalizedPhone },
-  });
 
-  if (user.isBlocked) {
-    throw new Error(user.blockReason || 'You are blocked from the fan chat.');
-  }
-
-  const store = await cookies();
-  store.set(CHAT_COOKIE_NAME, makeToken(user.id), { httpOnly: true, sameSite: 'lax', secure: false, path: '/' });
-  return user;
-}
-
-export async function logoutChatUser() {
-  const store = await cookies();
-  store.delete(CHAT_COOKIE_NAME);
-}
-
-export async function getChatUserSession() {
-  const store = await cookies();
-  const userId = readSignedId(store.get(CHAT_COOKIE_NAME)?.value);
-  if (!userId) return null;
-  const user = await prisma.chatUser.findUnique({ where: { id: userId } });
-  if (!user || user.isBlocked) {
-    store.delete(CHAT_COOKIE_NAME);
-    return null;
-  }
-  return user;
-}

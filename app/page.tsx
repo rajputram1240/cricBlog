@@ -17,7 +17,7 @@ const editorialSignals = [
   {
     value: '3',
     label: 'Fan experiences',
-    detail: 'Stories, live community chat, and ticket actions all work together on one front page.',
+    detail: 'Stories, premium category hubs, and ticket actions all work together on one front page.',
   },
 ];
 
@@ -36,21 +36,15 @@ const categoryPillars = [
   },
   {
     title: 'Fan action',
-    description: 'Open community chat rooms, browse ticket opportunities, and keep supporters participating beyond reading.',
-    href: '/fan-chat',
-    cta: 'Join the community',
+    description: 'Browse ticket opportunities and keep supporters participating beyond reading.',
+    href: '/tickets',
+    cta: 'Visit ticket auction',
   },
 ];
 
 const fanDestinations = [
   {
     eyebrow: 'Live now',
-    title: 'Matchday fan chat',
-    text: 'Give supporters a dedicated place to debate moments, celebrate wins, and react together in real time.',
-    href: '/fan-chat',
-  },
-  {
-    eyebrow: 'Marketplace',
     title: 'Cricket ticket exchange',
     text: 'Turn the homepage into a utility hub where fans can find and bid on the tickets they actually need.',
     href: '/tickets',
